@@ -1,0 +1,41 @@
+# Reimplementation directory - all research data and attack scripts
+reimplementation/
+
+# Documentation
+docs/
+
+# Results
+results/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# Environment variables (API keys)
+.env
+.env.local
+.env.*.local
+
+# Claude Code
+.claude/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
