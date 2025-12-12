@@ -1,0 +1,26 @@
+{
+  "model": "qwen3-235b",
+  "judge_model": "gpt-4o-2024-08-06",
+  "timestamp": "20251209_195655",
+  "stats": {
+    "total": 182,
+    "passed": 43,
+    "failed": 139,
+    "error": 0,
+    "skipped": 0
+  },
+  "pass_rate": 23.626373626373624,
+  "axis_stats": {
+    "INFERENCE_MEMORY": {
+      "total": 113,
+      "passed": 23,
+      "pass_rate": 20.353982300884958
+    },
+    "INSTRUCTION_RETENTION": {
+      "total": 69,
+      "passed": 20,
+      "pass_rate": 28.985507246376812
+    }
+  },
+  "evaluated_file": "results/qwen3-235b/evaluated_20251209_195655.jsonl"
+}

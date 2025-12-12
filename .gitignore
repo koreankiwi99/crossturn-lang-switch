@@ -4,8 +4,6 @@ reimplementation/
 # Documentation
 docs/
 
-# Results
-results/
 
 # Python
 __pycache__/
