@@ -1,0 +1,22 @@
+{
+  "condition_type": "distractor_multi",
+  "target_language": "de",
+  "expected_response_language": "de",
+  "method": "llm",
+  "judge_model": "gpt-4o-mini",
+  "stats": {
+    "total": 99,
+    "match": 86,
+    "mismatch": 12,
+    "mixed": 1,
+    "error": 0,
+    "skipped": 83
+  },
+  "fidelity_rate": 86.86868686868688,
+  "detected_distribution": {
+    "de": 86,
+    "en": 12,
+    "mixed": 1
+  },
+  "output_file": "results/qwen3-235b/distractor_multi/language_eval_de.jsonl"
+}

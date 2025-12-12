@@ -1,0 +1,21 @@
+{
+  "condition_type": "distractor_multi",
+  "target_language": "zh",
+  "expected_response_language": "zh",
+  "method": "llm",
+  "judge_model": "gpt-4o-mini",
+  "stats": {
+    "total": 107,
+    "match": 84,
+    "mismatch": 23,
+    "mixed": 0,
+    "error": 0,
+    "skipped": 75
+  },
+  "fidelity_rate": 78.50467289719626,
+  "detected_distribution": {
+    "zh": 84,
+    "en": 23
+  },
+  "output_file": "results/qwen3-235b/distractor_multi/language_eval_zh.jsonl"
+}

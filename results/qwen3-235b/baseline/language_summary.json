@@ -1,0 +1,20 @@
+{
+  "condition_type": "baseline",
+  "target_language": null,
+  "expected_response_language": "en",
+  "method": "llm",
+  "judge_model": "gpt-4o-mini",
+  "stats": {
+    "total": 110,
+    "match": 110,
+    "mismatch": 0,
+    "mixed": 0,
+    "error": 0,
+    "skipped": 72
+  },
+  "fidelity_rate": 100.0,
+  "detected_distribution": {
+    "en": 110
+  },
+  "output_file": "results/qwen3-235b/baseline/language_eval.jsonl"
+}

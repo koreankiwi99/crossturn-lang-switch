@@ -1,0 +1,22 @@
+{
+  "condition_type": "codeswitching_reverse",
+  "target_language": "es",
+  "expected_response_language": "en",
+  "method": "llm",
+  "judge_model": "gpt-4o-mini",
+  "stats": {
+    "total": 182,
+    "match": 6,
+    "mismatch": 173,
+    "mixed": 3,
+    "error": 0,
+    "skipped": 0
+  },
+  "fidelity_rate": 3.296703296703297,
+  "detected_distribution": {
+    "es": 173,
+    "en": 6,
+    "mixed": 3
+  },
+  "output_file": "results/claude-opus-4.5-openrouter/codeswitching_reverse/language_eval_es.jsonl"
+}

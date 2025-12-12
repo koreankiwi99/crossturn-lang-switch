@@ -1,0 +1,21 @@
+{
+  "condition_type": "distractor_multi",
+  "target_language": "ar",
+  "expected_response_language": "ar",
+  "method": "llm",
+  "judge_model": "gpt-4o-mini",
+  "stats": {
+    "total": 99,
+    "match": 42,
+    "mismatch": 57,
+    "mixed": 0,
+    "error": 0,
+    "skipped": 83
+  },
+  "fidelity_rate": 42.42424242424242,
+  "detected_distribution": {
+    "ar": 42,
+    "en": 57
+  },
+  "output_file": "results/qwen3-235b/distractor_multi/language_eval_ar.jsonl"
+}

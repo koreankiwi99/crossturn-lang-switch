@@ -1,0 +1,21 @@
+{
+  "condition_type": "codeswitching_reverse",
+  "target_language": "ar",
+  "expected_response_language": "en",
+  "method": "llm",
+  "judge_model": "gpt-4o-mini",
+  "stats": {
+    "total": 95,
+    "match": 54,
+    "mismatch": 41,
+    "mixed": 0,
+    "error": 0,
+    "skipped": 87
+  },
+  "fidelity_rate": 56.84210526315789,
+  "detected_distribution": {
+    "en": 54,
+    "ar": 41
+  },
+  "output_file": "results/qwen3-235b/codeswitching_reverse/language_eval_ar.jsonl"
+}

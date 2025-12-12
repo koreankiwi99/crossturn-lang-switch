@@ -1,0 +1,20 @@
+{
+  "condition_type": "full_translation",
+  "target_language": "de",
+  "expected_response_language": "de",
+  "method": "llm",
+  "judge_model": "gpt-4o-mini",
+  "stats": {
+    "total": 104,
+    "match": 104,
+    "mismatch": 0,
+    "mixed": 0,
+    "error": 0,
+    "skipped": 78
+  },
+  "fidelity_rate": 100.0,
+  "detected_distribution": {
+    "de": 104
+  },
+  "output_file": "results/qwen3-235b/full_translation/language_eval_de.jsonl"
+}
