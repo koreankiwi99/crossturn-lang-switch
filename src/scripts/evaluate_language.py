@@ -58,6 +58,30 @@ Return ONLY one of these codes: en, de, es, ar, zh, mixed
 
 Your answer:"""
 
+LANGUAGE_VERIFY_PROMPT = """Is this text written in {expected_lang_name}?
+
+<TEXT>
+{response}
+</TEXT>
+
+Rules:
+- Words like "No", "OK" exist in multiple languages - consider them valid in the expected language
+- Ignore code snippets, URLs, or proper nouns
+- Focus on the main content language
+
+Return ONLY: YES or NO
+
+Your answer:"""
+
+
+import re
+
+def clean_response_text(text):
+    """Clean response text before language detection."""
+    # Remove <thinking>...</thinking> blocks (Claude extended thinking)
+    text = re.sub(r'<thinking>.*?</thinking>', '', text, flags=re.DOTALL)
+    return text.strip()
+
 
 def get_openai_client():
     """Get OpenAI client for language judge."""
@@ -69,8 +93,9 @@ def get_openai_client():
 
 def detect_language_llm(client, response_text, max_chars=2000):
     """Detect language using LLM judge."""
-    # Truncate very long responses
-    text = response_text[:max_chars] if len(response_text) > max_chars else response_text
+    # Clean and truncate
+    text = clean_response_text(response_text)
+    text = text[:max_chars] if len(text) > max_chars else text
 
     try:
         result = client.chat.completions.create(
@@ -99,6 +124,35 @@ def detect_language_llm(client, response_text, max_chars=2000):
 
     except Exception as e:
         return f"error:{str(e)[:50]}"
+
+
+def verify_language_llm(client, response_text, expected_lang, max_chars=2000):
+    """Verify if response is in expected language using LLM judge."""
+    # Clean and truncate
+    text = clean_response_text(response_text)
+    text = text[:max_chars] if len(text) > max_chars else text
+
+    expected_lang_name = LANG_NAMES.get(expected_lang, expected_lang)
+
+    try:
+        result = client.chat.completions.create(
+            model=JUDGE_MODEL,
+            messages=[{"role": "user", "content": LANGUAGE_VERIFY_PROMPT.format(
+                response=text,
+                expected_lang_name=expected_lang_name
+            )}],
+            temperature=0.0,
+            max_tokens=10
+        )
+        answer = result.choices[0].message.content.strip().lower()
+
+        if "yes" in answer:
+            return True, expected_lang
+        else:
+            return False, "other"
+
+    except Exception as e:
+        return False, f"error:{str(e)[:50]}"
 
 
 def detect_language_fasttext(response_text):
@@ -229,27 +283,51 @@ def evaluate_language_fidelity(responses, client, condition_type, target_lang, o
 
         stats["total"] += 1
 
-        # Detect actual language
-        if method == "llm":
+        # Detect/verify language
+        if method == "verify":
+            is_match, detected = verify_language_llm(client, item["response"], expected)
+            if isinstance(is_match, bool) and is_match:
+                match_status = "match"
+                stats["match"] += 1
+                detected = expected  # Set detected to expected for consistency
+            elif detected.startswith("error"):
+                match_status = "error"
+                stats["error"] += 1
+            else:
+                match_status = "mismatch"
+                stats["mismatch"] += 1
+        elif method == "llm":
             detected = detect_language_llm(client, item["response"])
+            # Determine match
+            if detected.startswith("error"):
+                match_status = "error"
+                stats["error"] += 1
+            elif detected == "mixed":
+                match_status = "mixed"
+                stats["mixed"] += 1
+            elif detected == expected:
+                match_status = "match"
+                stats["match"] += 1
+            else:
+                match_status = "mismatch"
+                stats["mismatch"] += 1
         else:
             detected = detect_language_fasttext(item["response"])
+            # Determine match
+            if detected.startswith("error"):
+                match_status = "error"
+                stats["error"] += 1
+            elif detected == "mixed":
+                match_status = "mixed"
+                stats["mixed"] += 1
+            elif detected == expected:
+                match_status = "match"
+                stats["match"] += 1
+            else:
+                match_status = "mismatch"
+                stats["mismatch"] += 1
 
         detected_distribution[detected] += 1
-
-        # Determine match
-        if detected.startswith("error"):
-            match_status = "error"
-            stats["error"] += 1
-        elif detected == "mixed":
-            match_status = "mixed"
-            stats["mixed"] += 1
-        elif detected == expected:
-            match_status = "match"
-            stats["match"] += 1
-        else:
-            match_status = "mismatch"
-            stats["mismatch"] += 1
 
         result = {
             "question_id": item.get("question_id"),
@@ -306,9 +384,9 @@ def main():
     parser.add_argument("--input", type=str, required=True,
                        help="Input responses file(s) - supports glob patterns")
 
-    parser.add_argument("--method", type=str, default="llm",
-                       choices=["llm", "fasttext"],
-                       help="Detection method (default: llm)")
+    parser.add_argument("--method", type=str, default="verify",
+                       choices=["llm", "fasttext", "verify"],
+                       help="Detection method: verify (recommended), llm, or fasttext")
 
     parser.add_argument("--condition", type=str, default=None,
                        choices=["baseline", "codeswitching", "codeswitching_reverse",
@@ -336,7 +414,7 @@ def main():
     print(f"Files to process: {len(input_files)}")
     print(f"Method: {args.method}")
 
-    client = get_openai_client() if args.method == "llm" else None
+    client = get_openai_client() if args.method in ["llm", "verify"] else None
 
     all_summaries = []
 
