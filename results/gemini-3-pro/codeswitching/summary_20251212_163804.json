@@ -1,0 +1,26 @@
+{
+  "model": "gemini-3-pro",
+  "judge_model": "gpt-4o-2024-08-06",
+  "timestamp": "20251212_163804",
+  "stats": {
+    "total": 182,
+    "passed": 128,
+    "failed": 54,
+    "error": 0,
+    "skipped": 0
+  },
+  "pass_rate": 70.32967032967034,
+  "axis_stats": {
+    "INFERENCE_MEMORY": {
+      "total": 113,
+      "passed": 87,
+      "pass_rate": 76.99115044247787
+    },
+    "INSTRUCTION_RETENTION": {
+      "total": 69,
+      "passed": 41,
+      "pass_rate": 59.42028985507246
+    }
+  },
+  "evaluated_file": "results/gemini-3-pro/codeswitching/evaluated_20251212_163804.jsonl"
+}

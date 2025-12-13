@@ -1,0 +1,22 @@
+{
+  "condition_type": "full_translation",
+  "target_language": "de",
+  "expected_response_language": "de",
+  "method": "verify",
+  "judge_model": "gpt-4o-mini",
+  "num_workers": 64,
+  "stats": {
+    "total": 180,
+    "match": 178,
+    "mismatch": 2,
+    "mixed": 0,
+    "error": 0,
+    "skipped": 2
+  },
+  "fidelity_rate": 98.88888888888889,
+  "detected_distribution": {
+    "de": 178,
+    "other": 2
+  },
+  "output_file": "results/gemini-3-pro/full_translation/language_eval_de.jsonl"
+}

@@ -1,0 +1,22 @@
+{
+  "condition_type": "distractor",
+  "target_language": "de",
+  "expected_response_language": "de",
+  "method": "verify",
+  "judge_model": "gpt-4o-mini",
+  "num_workers": 64,
+  "stats": {
+    "total": 179,
+    "match": 167,
+    "mismatch": 12,
+    "mixed": 0,
+    "error": 0,
+    "skipped": 3
+  },
+  "fidelity_rate": 93.29608938547486,
+  "detected_distribution": {
+    "de": 167,
+    "other": 12
+  },
+  "output_file": "results/gemini-3-pro/distractor/language_eval_de.jsonl"
+}

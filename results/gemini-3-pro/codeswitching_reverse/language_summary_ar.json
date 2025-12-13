@@ -1,0 +1,22 @@
+{
+  "condition_type": "codeswitching_reverse",
+  "target_language": "ar",
+  "expected_response_language": "en",
+  "method": "verify",
+  "judge_model": "gpt-4o-mini",
+  "num_workers": 64,
+  "stats": {
+    "total": 180,
+    "match": 116,
+    "mismatch": 64,
+    "mixed": 0,
+    "error": 0,
+    "skipped": 2
+  },
+  "fidelity_rate": 64.44444444444444,
+  "detected_distribution": {
+    "en": 116,
+    "other": 64
+  },
+  "output_file": "results/gemini-3-pro/codeswitching_reverse/language_eval_ar.jsonl"
+}
