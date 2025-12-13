@@ -1,0 +1,22 @@
+{
+  "condition_type": "codeswitching_reverse",
+  "target_language": "de",
+  "expected_response_language": "en",
+  "method": "verify",
+  "judge_model": "gpt-4o-mini",
+  "num_workers": 64,
+  "stats": {
+    "total": 182,
+    "match": 168,
+    "mismatch": 14,
+    "mixed": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "fidelity_rate": 92.3076923076923,
+  "detected_distribution": {
+    "en": 168,
+    "other": 14
+  },
+  "output_file": "results/gpt-5/codeswitching_reverse/language_eval_de.jsonl"
+}

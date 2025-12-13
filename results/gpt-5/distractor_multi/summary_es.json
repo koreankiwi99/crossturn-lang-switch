@@ -1,0 +1,14 @@
+{
+  "model": "gpt-5",
+  "judge_model": "gpt-4o-2024-08-06",
+  "condition": "distractor_multi",
+  "language": "es",
+  "stats": {
+    "total": 182,
+    "passed": 106,
+    "failed": 76,
+    "error": 0,
+    "skipped": 0
+  },
+  "pass_rate": 58.24175824175825
+}

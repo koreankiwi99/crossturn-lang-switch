@@ -92,6 +92,17 @@ Total: **182 questions** per condition × 4 languages × 6 conditions = **4,368 
 | Distractor | 50.5% | 47.3% | 57.1% | 47.8% | 50.7% |
 | Distractor Multi | 51.6% | 48.4% | 54.4% | 51.6% | 51.5% |
 
+#### GPT-5
+
+| Condition | DE | ZH | ES | AR | Avg |
+|-----------|----:|----:|----:|----:|----:|
+| Baseline (EN) | 57.1% | 57.1% | 57.1% | 57.1% | 57.1% |
+| EN→X | 57.7% | 59.3% | 58.2% | 57.1% | 58.1% |
+| X→EN | 53.8% | 53.8% | 57.1% | 54.1% | 54.7% |
+| Full Translation | 56.0% | 57.7% | 57.1% | 58.6% | 57.4% |
+| Distractor | 59.9% | 57.1% | 63.2% | 60.4% | 60.2% |
+| Distractor Multi | 54.9% | 57.7% | 58.2% | 58.8% | 57.4% |
+
 ### Layer 1: Language Fidelity
 
 #### Qwen3-235B-A22B
@@ -116,20 +127,32 @@ Total: **182 questions** per condition × 4 languages × 6 conditions = **4,368 
 | Distractor | X | 94.5% | 96.2% | 95.1% | 96.7% | 95.6% |
 | Distractor Multi | X | 93.4% | 95.1% | 92.9% | 95.1% | 94.1% |
 
+#### GPT-5
+
+| Condition | Expected | DE | ZH | ES | AR | Avg |
+|-----------|----------|----:|----:|----:|----:|----:|
+| Baseline | EN | 100% | 100% | 100% | 100% | 100% |
+| EN→X | X | 98.9% | 97.8% | 100% | 98.9% | 98.9% |
+| X→EN | EN | 92.3% | 94.5% | 95.1% | 95.1% | 94.2% |
+| Full Translation | X | 100% | 100% | 100% | 100% | 100% |
+| Distractor | X | 98.9% | 98.4% | 99.5% | 98.4% | 98.8% |
+| Distractor Multi | X | 94.5% | 95.6% | 95.6% | 96.2% | 95.5% |
+
 ### Key Findings
 
 **Task Accuracy (Layer 2):**
 - **Gemini 3 Pro** shows highest baseline (71.4%) and remarkable stability across all conditions (max ~3% drop on X→EN)
+- **GPT-5** shows strong baseline (57.1%) with slight improvements on code-switching (+1% on EN→X)
 - Claude shows smaller performance gaps than Qwen3 (max ~6% drop vs ~13%)
-- X→EN (foreign context, English query) shows the largest drop for Claude (-5.8%) and Gemini (-3%)
+- X→EN (foreign context, English query) shows the largest drop for Claude (-8.2%) but minimal for GPT-5 (-2.4%)
 - Arabic shows the largest degradation for Qwen across all conditions
-- Distractors barely affect Claude (-0.5% to -1.3%) or Gemini (-0.5% to -0.7%)
+- Distractors improve GPT-5 (+3%), barely affect Claude or Gemini
 
 **Language Fidelity (Layer 1):**
-- X→EN is broken for both models: When context is foreign but query is English, both respond in context language (Claude: 97%, Qwen: 65%)
-- Claude has better language fidelity: 96% vs 86% on EN→X codeswitching
-- Arabic is problematic for Qwen: Only 78% EN→X, 42% distractor_multi
-- **Key insight**: Models prioritize conversation context language over query language
+- **GPT-5 handles X→EN correctly** (94.2% fidelity) - responds in English when queried in English
+- X→EN is broken for Claude and Qwen: respond in context language (Claude: 97% wrong, Qwen: 65% wrong)
+- All models achieve near-perfect language fidelity on Full Translation (100%)
+- **Key insight**: Only GPT-5 prioritizes query language over context language in X→EN condition
 
 ## Usage
 
