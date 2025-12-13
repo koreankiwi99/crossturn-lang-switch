@@ -2,8 +2,9 @@
   "condition_type": "full_translation",
   "target_language": "ar",
   "expected_response_language": "ar",
-  "method": "llm",
+  "method": "verify",
   "judge_model": "gpt-4o-mini",
+  "num_workers": 64,
   "stats": {
     "total": 182,
     "match": 182,

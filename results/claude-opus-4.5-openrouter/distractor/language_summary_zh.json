@@ -2,20 +2,21 @@
   "condition_type": "distractor",
   "target_language": "zh",
   "expected_response_language": "zh",
-  "method": "llm",
+  "method": "verify",
   "judge_model": "gpt-4o-mini",
+  "num_workers": 64,
   "stats": {
     "total": 182,
-    "match": 173,
-    "mismatch": 9,
+    "match": 175,
+    "mismatch": 7,
     "mixed": 0,
     "error": 0,
     "skipped": 0
   },
-  "fidelity_rate": 95.05494505494505,
+  "fidelity_rate": 96.15384615384616,
   "detected_distribution": {
-    "zh": 173,
-    "en": 9
+    "zh": 175,
+    "other": 7
   },
   "output_file": "results/claude-opus-4.5-openrouter/distractor/language_eval_zh.jsonl"
 }

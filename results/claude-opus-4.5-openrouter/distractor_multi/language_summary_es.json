@@ -2,21 +2,21 @@
   "condition_type": "distractor_multi",
   "target_language": "es",
   "expected_response_language": "es",
-  "method": "llm",
+  "method": "verify",
   "judge_model": "gpt-4o-mini",
+  "num_workers": 64,
   "stats": {
     "total": 182,
-    "match": 168,
-    "mismatch": 12,
-    "mixed": 2,
+    "match": 169,
+    "mismatch": 13,
+    "mixed": 0,
     "error": 0,
     "skipped": 0
   },
-  "fidelity_rate": 92.3076923076923,
+  "fidelity_rate": 92.85714285714286,
   "detected_distribution": {
-    "es": 168,
-    "en": 12,
-    "mixed": 2
+    "es": 169,
+    "other": 13
   },
   "output_file": "results/claude-opus-4.5-openrouter/distractor_multi/language_eval_es.jsonl"
 }

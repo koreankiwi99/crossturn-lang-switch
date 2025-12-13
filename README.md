@@ -50,7 +50,7 @@ Total: **182 questions** per condition × 4 languages × 6 conditions = **4,368 
 |-------|------|-------|
 | Claude Opus 4.5 | Closed | Best on MultiChallenge |
 | GPT-5 | Closed | OpenAI flagship |
-| Gemini 2.5 Pro | Closed | Google flagship |
+| Gemini 3 Pro | Closed | Google flagship |
 | Llama 4 Maverick | Open | Meta MoE |
 | Qwen3-235B-A22B | Open | Chinese-origin, 119 languages |
 | Apertus 70B | Multilingual | Swiss, 1000+ languages |
@@ -58,6 +58,17 @@ Total: **182 questions** per condition × 4 languages × 6 conditions = **4,368 
 ## Results
 
 ### Layer 2: Task Accuracy
+
+#### Gemini 3 Pro
+
+| Condition | DE | ZH | ES | AR | Avg |
+|-----------|----:|----:|----:|----:|----:|
+| Baseline (EN) | 71.4% | 71.4% | 71.4% | 71.4% | 71.4% |
+| EN→X | 70.3% | 69.8% | 70.3% | 71.4% | 70.5% |
+| X→EN | 67.6% | 68.7% | 67.6% | 69.8% | 68.4% |
+| Full Translation | 69.8% | 74.7% | 69.8% | 69.8% | 71.0% |
+| Distractor | 71.4% | 70.3% | 70.9% | 70.3% | 70.7% |
+| Distractor Multi | 70.9% | 69.2% | 73.6% | 69.8% | 70.9% |
 
 #### Qwen3-235B-A22B
 
@@ -74,7 +85,7 @@ Total: **182 questions** per condition × 4 languages × 6 conditions = **4,368 
 
 | Condition | DE | ZH | ES | AR | Avg |
 |-----------|----:|----:|----:|----:|----:|
-| Baseline (EN) | 52.0% | 52.0% | 52.0% | 52.0% | 52.0% |
+| Baseline (EN) | 54.4% | 54.4% | 54.4% | 54.4% | 54.4% |
 | EN→X | 47.8% | 47.8% | 53.8% | 52.7% | 50.5% |
 | X→EN | 45.1% | 46.2% | 47.8% | 45.6% | 46.2% |
 | Full Translation | 45.6% | 51.1% | 46.2% | 49.5% | 48.1% |
@@ -99,19 +110,20 @@ Total: **182 questions** per condition × 4 languages × 6 conditions = **4,368 
 | Condition | Expected | DE | ZH | ES | AR | Avg |
 |-----------|----------|----:|----:|----:|----:|----:|
 | Baseline | EN | 100% | 100% | 100% | 100% | 100% |
-| EN→X | X | 97.8% | 94.5% | 96.7% | 96.7% | 96.4% |
-| X→EN | EN | 1.6% | 3.3% | 3.3% | 2.7% | 2.7% |
-| Full Translation | X | 99.5% | 99.5% | 99.5% | 100% | 99.6% |
-| Distractor | X | 94.5% | 95.1% | 95.1% | 96.2% | 95.2% |
-| Distractor Multi | X | 93.9% | 92.9% | 92.3% | 94.0% | 93.3% |
+| EN→X | X | 98.4% | 95.1% | 96.2% | 97.8% | 96.9% |
+| X→EN | EN | 2.7% | 3.8% | 3.8% | 3.8% | 3.5% |
+| Full Translation | X | 100% | 100% | 100% | 100% | 100% |
+| Distractor | X | 94.5% | 96.2% | 95.1% | 96.7% | 95.6% |
+| Distractor Multi | X | 93.4% | 95.1% | 92.9% | 95.1% | 94.1% |
 
 ### Key Findings
 
 **Task Accuracy (Layer 2):**
+- **Gemini 3 Pro** shows highest baseline (71.4%) and remarkable stability across all conditions (max ~3% drop on X→EN)
 - Claude shows smaller performance gaps than Qwen3 (max ~6% drop vs ~13%)
-- X→EN (foreign context, English query) shows the largest drop for Claude (-5.8%)
+- X→EN (foreign context, English query) shows the largest drop for Claude (-5.8%) and Gemini (-3%)
 - Arabic shows the largest degradation for Qwen across all conditions
-- Distractors barely affect Claude (-0.5% to -1.3% on average)
+- Distractors barely affect Claude (-0.5% to -1.3%) or Gemini (-0.5% to -0.7%)
 
 **Language Fidelity (Layer 1):**
 - X→EN is broken for both models: When context is foreign but query is English, both respond in context language (Claude: 97%, Qwen: 65%)
@@ -219,6 +231,7 @@ python src/scripts/evaluate.py --input results/qwen3-235b/responses_*.jsonl
 - Translation quality: Uses Google Translate, which may introduce artifacts
 - Limited language coverage: Only 4 languages tested
 - Distractor design: Current distractors are benign small talk - may need adversarial variants to stress-test robust models
+- Qwen3-235B empty responses: ~40% of responses are empty due to reasoning token exhaustion (model uses hidden thinking tokens that don't appear in output). This is a known issue with reasoning models.
 
 ## Citation
 

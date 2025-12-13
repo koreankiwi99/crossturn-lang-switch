@@ -2,11 +2,12 @@
   "condition_type": "baseline",
   "target_language": null,
   "expected_response_language": "en",
-  "method": "llm",
+  "method": "verify",
   "judge_model": "gpt-4o-mini",
+  "num_workers": 64,
   "stats": {
-    "total": 177,
-    "match": 177,
+    "total": 182,
+    "match": 182,
     "mismatch": 0,
     "mixed": 0,
     "error": 0,
@@ -14,7 +15,7 @@
   },
   "fidelity_rate": 100.0,
   "detected_distribution": {
-    "en": 177
+    "en": 182
   },
   "output_file": "results/claude-opus-4.5-openrouter/baseline/language_eval.jsonl"
 }
