@@ -1,0 +1,22 @@
+{
+  "condition_type": "codeswitching_reverse",
+  "target_language": "de",
+  "expected_response_language": "en",
+  "method": "verify",
+  "judge_model": "gpt-4o-mini",
+  "num_workers": 64,
+  "stats": {
+    "total": 182,
+    "match": 67,
+    "mismatch": 115,
+    "mixed": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "fidelity_rate": 36.81318681318682,
+  "detected_distribution": {
+    "other": 115,
+    "en": 67
+  },
+  "output_file": "results/deepseek-v3.1/codeswitching_reverse/language_eval_de.jsonl"
+}

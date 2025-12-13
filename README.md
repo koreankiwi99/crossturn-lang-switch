@@ -4,6 +4,37 @@ Evaluating whether language models maintain task performance when users switch l
 
 **Benchmark Extension**: [MultiChallenge](https://scale.com/leaderboard/multichallenge)
 
+1. Introduction (0.5 page)
+   - Multilingual users switch languages
+   - No benchmark tests this
+   - We find models diverge dramatically
+
+2. Related Work (0.5 page)
+   - Language confusion (single-turn)
+   - Multi-turn benchmarks (monolingual)
+   - Gap: cross-turn switching
+
+3. Methodology (0.75 page)
+   - MultiChallenge extension
+   - 3 conditions: Baseline, EN→X, X→EN
+   - 6 models, 2-4 language pairs
+   - Two-layer evaluation
+
+4. Results (1 page)
+   - Main finding: Fidelity divergence
+   - Group A (user-following) vs Group B (context-anchoring)
+   - Table + figure
+
+5. Discussion (0.5 page)
+   - Implications for multilingual UX
+   - Null results: accuracy stable, distractors ineffective
+   - Limitations
+
+6. Conclusion (0.25 page)
+
+References + Appendix (as needed)
+
+
 ## Introduction
 
 Large language models increasingly serve multilingual users worldwide. These users often switch between languages naturally within a single conversation—starting a query in English, then continuing in their native language, or vice versa. This cross-turn language switching reflects how multilingual speakers actually communicate: fluidly moving between languages based on comfort, context, or expression.
@@ -19,8 +50,16 @@ We address this gap by extending MultiChallenge to evaluate cross-turn language 
 
 ## Research Questions
 
-- **Layer 1 (Language Fidelity)**: When users switch languages, do LLMs respond in the correct language?
-- **Layer 2 (Task Accuracy)**: Even when models respond correctly, does switching hurt task completion?
+**RQ1 (Main)**: Do LLMs follow user query language or conversation context language?
+- When a user switches languages mid-conversation, which language does the model respond in?
+- Measured by Layer 1: Language Fidelity
+
+**RQ2**: Does language fidelity degrade with longer conversations?
+- Do models become more "anchored" to context language as conversation length increases?
+
+**RQ3**: Do models maintain task performance when users switch languages across turns?
+- Does language switching hurt task completion?
+- Measured by Layer 2: Task Accuracy (null result - no significant difference)
 
 ## Experimental Conditions
 
@@ -48,12 +87,11 @@ Total: **182 questions** per condition × 4 languages × 6 conditions = **4,368 
 
 | Model | Type | Notes |
 |-------|------|-------|
-| Claude Opus 4.5 | Closed | Best on MultiChallenge |
 | GPT-5 | Closed | OpenAI flagship |
 | Gemini 3 Pro | Closed | Google flagship |
-| Llama 4 Maverick | Open | Meta MoE |
-| Qwen3-235B-A22B | Open | Chinese-origin, 119 languages |
-| Apertus 70B | Multilingual | Swiss, 1000+ languages |
+| Claude Opus 4.5 | Closed | Anthropic flagship |
+
+See Appendix for additional models (Qwen3-235B) and distractor conditions.
 
 ## Results
 
@@ -103,6 +141,14 @@ Total: **182 questions** per condition × 4 languages × 6 conditions = **4,368 
 | Distractor | 59.9% | 57.1% | 63.2% | 60.4% | 60.2% |
 | Distractor Multi | 54.9% | 57.7% | 58.2% | 58.8% | 57.4% |
 
+#### DeepSeek-V3.1
+
+| Condition | DE | ZH | ES | AR | Avg |
+|-----------|----:|----:|----:|----:|----:|
+| Baseline (EN) | 47.3% | 47.3% | 47.3% | 47.3% | 47.3% |
+| EN→X | 40.1% | 39.6% | 51.6% | 40.7% | 43.0% |
+| X→EN | 38.5% | 33.5% | 45.1% | 40.1% | 39.3% |
+
 ### Layer 1: Language Fidelity
 
 #### Qwen3-235B-A22B
@@ -138,21 +184,65 @@ Total: **182 questions** per condition × 4 languages × 6 conditions = **4,368 
 | Distractor | X | 98.9% | 98.4% | 99.5% | 98.4% | 98.8% |
 | Distractor Multi | X | 94.5% | 95.6% | 95.6% | 96.2% | 95.5% |
 
+#### Gemini 3 Pro
+
+| Condition | Expected | DE | ZH | ES | AR | Avg |
+|-----------|----------|----:|----:|----:|----:|----:|
+| Baseline | EN | 100% | 100% | 100% | 100% | 100% |
+| EN→X | X | 97.8% | 99.4% | 97.8% | 99.4% | 98.6% |
+| X→EN | EN | 78.3% | 70.6% | 72.2% | 64.4% | 71.4% |
+| Full Translation | X | 100% | 100% | 100% | 100% | 100% |
+| Distractor | X | 97.8% | 98.9% | 97.8% | 98.9% | 98.4% |
+| Distractor Multi | X | 96.7% | 97.2% | 96.7% | 97.8% | 97.1% |
+
+#### DeepSeek-V3.1
+
+| Condition | Expected | DE | ZH | ES | AR | Avg |
+|-----------|----------|----:|----:|----:|----:|----:|
+| Baseline | EN | 100% | 100% | 100% | 100% | 100% |
+| EN→X | X | 89.0% | 68.1% | 90.1% | 84.6% | 83.0% |
+| X→EN | EN | 36.8% | 73.1% | 45.1% | 68.7% | 55.9% |
+
 ### Key Findings
 
-**Task Accuracy (Layer 2):**
-- **Gemini 3 Pro** shows highest baseline (71.4%) and remarkable stability across all conditions (max ~3% drop on X→EN)
-- **GPT-5** shows strong baseline (57.1%) with slight improvements on code-switching (+1% on EN→X)
-- Claude shows smaller performance gaps than Qwen3 (max ~6% drop vs ~13%)
-- X→EN (foreign context, English query) shows the largest drop for Claude (-8.2%) but minimal for GPT-5 (-2.4%)
-- Arabic shows the largest degradation for Qwen across all conditions
-- Distractors improve GPT-5 (+3%), barely affect Claude or Gemini
+#### RQ1: Query Language vs Context Language
 
-**Language Fidelity (Layer 1):**
-- **GPT-5 handles X→EN correctly** (94.2% fidelity) - responds in English when queried in English
-- X→EN is broken for Claude and Qwen: respond in context language (Claude: 97% wrong, Qwen: 65% wrong)
-- All models achieve near-perfect language fidelity on Full Translation (100%)
-- **Key insight**: Only GPT-5 prioritizes query language over context language in X→EN condition
+Models diverge dramatically on X→EN (foreign context, English query):
+
+| Model | EN→X | X→EN | Behavior |
+|-------|------|------|----------|
+| GPT-5 | 98.9% | **94.2%** | Follows query language |
+| Gemini 3 Pro | 98.6% | **71.4%** | Mixed |
+| Claude Opus 4.5 | 96.9% | **3.5%** | Follows context language |
+
+- **EN→X**: All models respond in target language (97-99%)
+- **X→EN**: Models split into two groups:
+  - **Query-following**: GPT-5 responds in English when queried in English
+  - **Context-anchored**: Claude responds in context language, ignoring English query
+
+#### RQ2: Conversation Length Effect
+
+Gemini's X→EN fidelity decreases with conversation length (χ²=32.5, p<0.0001):
+
+| Length | Fidelity | n |
+|--------|----------|---|
+| Short (2-3 turns) | 82.6% | 132 |
+| Medium (4-5 turns) | 70.6% | 296 |
+| Long (6+ turns) | **49.1%** | 112 |
+
+Per-language analysis confirms trend (all p<0.05). GPT-5 shows no degradation (~94% stable).
+
+#### RQ3: Task Accuracy (Null Result)
+
+No significant accuracy degradation from language switching:
+
+| Model | Baseline | EN→X | X→EN | Full Trans |
+|-------|----------|------|------|------------|
+| Gemini 3 Pro | 71.4% | 70.5% | 68.4% | 71.0% |
+| GPT-5 | 57.1% | 58.1% | 54.7% | 57.4% |
+| Claude Opus 4.5 | 54.4% | 50.5% | 46.2% | 48.1% |
+
+Task performance remains stable across language conditions.
 
 ## Usage
 

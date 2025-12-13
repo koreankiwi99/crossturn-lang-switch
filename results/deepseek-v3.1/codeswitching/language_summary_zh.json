@@ -1,0 +1,22 @@
+{
+  "condition_type": "codeswitching",
+  "target_language": "zh",
+  "expected_response_language": "zh",
+  "method": "verify",
+  "judge_model": "gpt-4o-mini",
+  "num_workers": 64,
+  "stats": {
+    "total": 182,
+    "match": 124,
+    "mismatch": 58,
+    "mixed": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "fidelity_rate": 68.13186813186813,
+  "detected_distribution": {
+    "other": 58,
+    "zh": 124
+  },
+  "output_file": "results/deepseek-v3.1/codeswitching/language_eval_zh.jsonl"
+}

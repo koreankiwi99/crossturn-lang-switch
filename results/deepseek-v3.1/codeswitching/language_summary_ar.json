@@ -1,0 +1,22 @@
+{
+  "condition_type": "codeswitching",
+  "target_language": "ar",
+  "expected_response_language": "ar",
+  "method": "verify",
+  "judge_model": "gpt-4o-mini",
+  "num_workers": 64,
+  "stats": {
+    "total": 182,
+    "match": 154,
+    "mismatch": 28,
+    "mixed": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "fidelity_rate": 84.61538461538461,
+  "detected_distribution": {
+    "ar": 154,
+    "other": 28
+  },
+  "output_file": "results/deepseek-v3.1/codeswitching/language_eval_ar.jsonl"
+}
