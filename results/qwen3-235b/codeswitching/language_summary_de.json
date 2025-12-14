@@ -2,8 +2,9 @@
   "condition_type": "codeswitching",
   "target_language": "de",
   "expected_response_language": "de",
-  "method": "llm",
+  "method": "verify",
   "judge_model": "gpt-4o-mini",
+  "num_workers": 64,
   "stats": {
     "total": 107,
     "match": 99,
@@ -15,7 +16,7 @@
   "fidelity_rate": 92.5233644859813,
   "detected_distribution": {
     "de": 99,
-    "en": 8
+    "other": 8
   },
-  "output_file": "results/qwen3-235b/codeswitching/language_eval_de.jsonl"
+  "output_file": "../../results/qwen3-235b/codeswitching/language_eval_de.jsonl"
 }

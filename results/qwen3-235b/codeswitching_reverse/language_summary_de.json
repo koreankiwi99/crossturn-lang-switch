@@ -2,8 +2,9 @@
   "condition_type": "codeswitching_reverse",
   "target_language": "de",
   "expected_response_language": "en",
-  "method": "llm",
+  "method": "verify",
   "judge_model": "gpt-4o-mini",
+  "num_workers": 64,
   "stats": {
     "total": 102,
     "match": 33,
@@ -14,8 +15,8 @@
   },
   "fidelity_rate": 32.35294117647059,
   "detected_distribution": {
-    "de": 69,
+    "other": 69,
     "en": 33
   },
-  "output_file": "results/qwen3-235b/codeswitching_reverse/language_eval_de.jsonl"
+  "output_file": "../../results/qwen3-235b/codeswitching_reverse/language_eval_de.jsonl"
 }

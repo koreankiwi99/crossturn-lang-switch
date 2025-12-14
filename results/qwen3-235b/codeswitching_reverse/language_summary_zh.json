@@ -2,20 +2,21 @@
   "condition_type": "codeswitching_reverse",
   "target_language": "zh",
   "expected_response_language": "en",
-  "method": "llm",
+  "method": "verify",
   "judge_model": "gpt-4o-mini",
+  "num_workers": 64,
   "stats": {
     "total": 112,
-    "match": 32,
-    "mismatch": 80,
+    "match": 33,
+    "mismatch": 79,
     "mixed": 0,
     "error": 0,
     "skipped": 70
   },
-  "fidelity_rate": 28.57142857142857,
+  "fidelity_rate": 29.464285714285715,
   "detected_distribution": {
-    "en": 32,
-    "zh": 80
+    "en": 33,
+    "other": 79
   },
-  "output_file": "results/qwen3-235b/codeswitching_reverse/language_eval_zh.jsonl"
+  "output_file": "../../results/qwen3-235b/codeswitching_reverse/language_eval_zh.jsonl"
 }

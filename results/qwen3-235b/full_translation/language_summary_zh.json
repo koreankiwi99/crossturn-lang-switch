@@ -2,8 +2,9 @@
   "condition_type": "full_translation",
   "target_language": "zh",
   "expected_response_language": "zh",
-  "method": "llm",
+  "method": "verify",
   "judge_model": "gpt-4o-mini",
+  "num_workers": 64,
   "stats": {
     "total": 107,
     "match": 106,
@@ -15,7 +16,7 @@
   "fidelity_rate": 99.06542056074767,
   "detected_distribution": {
     "zh": 106,
-    "en": 1
+    "other": 1
   },
-  "output_file": "results/qwen3-235b/full_translation/language_eval_zh.jsonl"
+  "output_file": "../../results/qwen3-235b/full_translation/language_eval_zh.jsonl"
 }

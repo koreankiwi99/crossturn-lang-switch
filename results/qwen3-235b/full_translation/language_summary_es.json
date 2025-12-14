@@ -2,8 +2,9 @@
   "condition_type": "full_translation",
   "target_language": "es",
   "expected_response_language": "es",
-  "method": "llm",
+  "method": "verify",
   "judge_model": "gpt-4o-mini",
+  "num_workers": 64,
   "stats": {
     "total": 114,
     "match": 113,
@@ -15,7 +16,7 @@
   "fidelity_rate": 99.12280701754386,
   "detected_distribution": {
     "es": 113,
-    "en": 1
+    "other": 1
   },
-  "output_file": "results/qwen3-235b/full_translation/language_eval_es.jsonl"
+  "output_file": "../../results/qwen3-235b/full_translation/language_eval_es.jsonl"
 }

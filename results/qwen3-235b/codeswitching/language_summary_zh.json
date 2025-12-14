@@ -2,20 +2,21 @@
   "condition_type": "codeswitching",
   "target_language": "zh",
   "expected_response_language": "zh",
-  "method": "llm",
+  "method": "verify",
   "judge_model": "gpt-4o-mini",
+  "num_workers": 64,
   "stats": {
     "total": 109,
-    "match": 87,
-    "mismatch": 22,
+    "match": 88,
+    "mismatch": 21,
     "mixed": 0,
     "error": 0,
     "skipped": 73
   },
-  "fidelity_rate": 79.81651376146789,
+  "fidelity_rate": 80.73394495412845,
   "detected_distribution": {
-    "zh": 87,
-    "en": 22
+    "zh": 88,
+    "other": 21
   },
-  "output_file": "results/qwen3-235b/codeswitching/language_eval_zh.jsonl"
+  "output_file": "../../results/qwen3-235b/codeswitching/language_eval_zh.jsonl"
 }

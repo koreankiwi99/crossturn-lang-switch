@@ -2,8 +2,9 @@
   "condition_type": "baseline",
   "target_language": null,
   "expected_response_language": "en",
-  "method": "llm",
+  "method": "verify",
   "judge_model": "gpt-4o-mini",
+  "num_workers": 64,
   "stats": {
     "total": 110,
     "match": 110,
@@ -16,5 +17,5 @@
   "detected_distribution": {
     "en": 110
   },
-  "output_file": "results/qwen3-235b/baseline/language_eval.jsonl"
+  "output_file": "../../results/qwen3-235b/baseline/language_eval.jsonl"
 }

@@ -1,0 +1,187 @@
+{
+  "timestamp": "20251210_114608",
+  "model": "gpt-4o-2024-08-06",
+  "samples_per_dataset": 15,
+  "datasets": [
+    {
+      "name": "distractor_es.jsonl",
+      "summary": {
+        "avg_semantic_accuracy": 5.0,
+        "avg_completeness": 5.0,
+        "avg_overall_quality": 5.0,
+        "constraints_preserved": {
+          "Yes": 2,
+          "No": 0,
+          "NA": 13
+        },
+        "total_verified": 15,
+        "low_quality_count": 0
+      }
+    },
+    {
+      "name": "distractor_de.jsonl",
+      "summary": {
+        "avg_semantic_accuracy": 4.733333333333333,
+        "avg_completeness": 4.8,
+        "avg_overall_quality": 4.733333333333333,
+        "constraints_preserved": {
+          "Yes": 3,
+          "No": 0,
+          "NA": 12
+        },
+        "total_verified": 15,
+        "low_quality_count": 0
+      }
+    },
+    {
+      "name": "distractor_ar.jsonl",
+      "summary": {
+        "avg_semantic_accuracy": 4.866666666666666,
+        "avg_completeness": 4.866666666666666,
+        "avg_overall_quality": 4.866666666666666,
+        "constraints_preserved": {
+          "Yes": 1,
+          "No": 0,
+          "NA": 14
+        },
+        "total_verified": 15,
+        "low_quality_count": 0
+      }
+    },
+    {
+      "name": "distractor_zh_multi.jsonl",
+      "summary": {
+        "avg_semantic_accuracy": 5.0,
+        "avg_completeness": 5.0,
+        "avg_overall_quality": 5.0,
+        "constraints_preserved": {
+          "Yes": 2,
+          "No": 0,
+          "NA": 13
+        },
+        "total_verified": 15,
+        "low_quality_count": 0
+      }
+    },
+    {
+      "name": "distractor_ar_multi.jsonl",
+      "summary": {
+        "avg_semantic_accuracy": 4.866666666666666,
+        "avg_completeness": 4.933333333333334,
+        "avg_overall_quality": 4.866666666666666,
+        "constraints_preserved": {
+          "Yes": 2,
+          "No": 0,
+          "NA": 13
+        },
+        "total_verified": 15,
+        "low_quality_count": 0
+      }
+    },
+    {
+      "name": "distractor_zh.jsonl",
+      "summary": {
+        "avg_semantic_accuracy": 4.933333333333334,
+        "avg_completeness": 5.0,
+        "avg_overall_quality": 4.933333333333334,
+        "constraints_preserved": {
+          "Yes": 1,
+          "No": 0,
+          "NA": 14
+        },
+        "total_verified": 15,
+        "low_quality_count": 0
+      }
+    },
+    {
+      "name": "distractor_de_multi.jsonl",
+      "summary": {
+        "avg_semantic_accuracy": 4.8,
+        "avg_completeness": 4.933333333333334,
+        "avg_overall_quality": 4.8,
+        "constraints_preserved": {
+          "Yes": 4,
+          "No": 0,
+          "NA": 11
+        },
+        "total_verified": 15,
+        "low_quality_count": 0
+      }
+    },
+    {
+      "name": "distractor_es_multi.jsonl",
+      "summary": {
+        "avg_semantic_accuracy": 5.0,
+        "avg_completeness": 5.0,
+        "avg_overall_quality": 5.0,
+        "constraints_preserved": {
+          "Yes": 3,
+          "No": 0,
+          "NA": 12
+        },
+        "total_verified": 15,
+        "low_quality_count": 0
+      }
+    },
+    {
+      "name": "full_translation_es.jsonl",
+      "summary": {
+        "avg_semantic_accuracy": 0,
+        "avg_completeness": 0,
+        "avg_overall_quality": 0,
+        "constraints_preserved": {
+          "Yes": 0,
+          "No": 0,
+          "NA": 0
+        },
+        "total_verified": 0,
+        "low_quality_count": 0
+      }
+    },
+    {
+      "name": "full_translation_de.jsonl",
+      "summary": {
+        "avg_semantic_accuracy": 0,
+        "avg_completeness": 0,
+        "avg_overall_quality": 0,
+        "constraints_preserved": {
+          "Yes": 0,
+          "No": 0,
+          "NA": 0
+        },
+        "total_verified": 0,
+        "low_quality_count": 0
+      }
+    },
+    {
+      "name": "full_translation_ar.jsonl",
+      "summary": {
+        "avg_semantic_accuracy": 0,
+        "avg_completeness": 0,
+        "avg_overall_quality": 0,
+        "constraints_preserved": {
+          "Yes": 0,
+          "No": 0,
+          "NA": 0
+        },
+        "total_verified": 0,
+        "low_quality_count": 0
+      }
+    },
+    {
+      "name": "full_translation_zh.jsonl",
+      "summary": {
+        "avg_semantic_accuracy": 0,
+        "avg_completeness": 0,
+        "avg_overall_quality": 0,
+        "constraints_preserved": {
+          "Yes": 0,
+          "No": 0,
+          "NA": 0
+        },
+        "total_verified": 0,
+        "low_quality_count": 0
+      }
+    }
+  ]
+}

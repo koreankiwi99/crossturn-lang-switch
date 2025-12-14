@@ -2,8 +2,9 @@
   "condition_type": "full_translation",
   "target_language": "ar",
   "expected_response_language": "ar",
-  "method": "llm",
+  "method": "verify",
   "judge_model": "gpt-4o-mini",
+  "num_workers": 64,
   "stats": {
     "total": 103,
     "match": 103,
@@ -16,5 +17,5 @@
   "detected_distribution": {
     "ar": 103
   },
-  "output_file": "results/qwen3-235b/full_translation/language_eval_ar.jsonl"
+  "output_file": "../../results/qwen3-235b/full_translation/language_eval_ar.jsonl"
 }

@@ -2,8 +2,9 @@
   "condition_type": "codeswitching",
   "target_language": "ar",
   "expected_response_language": "ar",
-  "method": "llm",
+  "method": "verify",
   "judge_model": "gpt-4o-mini",
+  "num_workers": 64,
   "stats": {
     "total": 118,
     "match": 92,
@@ -15,7 +16,7 @@
   "fidelity_rate": 77.96610169491525,
   "detected_distribution": {
     "ar": 92,
-    "en": 26
+    "other": 26
   },
-  "output_file": "results/qwen3-235b/codeswitching/language_eval_ar.jsonl"
+  "output_file": "../../results/qwen3-235b/codeswitching/language_eval_ar.jsonl"
 }
