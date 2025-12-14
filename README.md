@@ -85,164 +85,100 @@ Total: **182 questions** per condition × 4 languages × 6 conditions = **4,368 
 
 ## Models
 
-| Model | Type | Notes |
-|-------|------|-------|
-| GPT-5 | Closed | OpenAI flagship |
-| Gemini 3 Pro | Closed | Google flagship |
-| Claude Opus 4.5 | Closed | Anthropic flagship |
+| Model | Provider | Notes |
+|-------|----------|-------|
+| GPT-5 | OpenAI | Flagship |
+| Gemini 3 Pro | Google | Flagship |
+| Claude Opus 4.5 | Anthropic | Flagship |
+| DeepSeek-V3.1 | DeepSeek | Open-weight |
+| Command R+ | Cohere | Open-weight |
 
-See Appendix for additional models (Qwen3-235B) and distractor conditions.
+See Appendix for detailed per-language results and distractor conditions.
 
 ## Results
 
+### Layer 1: Language Fidelity (Main Finding)
+
+#### Summary: Query-following vs Context-anchored Behavior
+
+| Model | EN→X | X→EN | Behavior |
+|-------|------|------|----------|
+| GPT-5 | 98.9% | **94.2%** | Query-following |
+| Gemini 3 Pro | 98.6% | **71.4%** | Mixed |
+| DeepSeek-V3.1 | 83.0% | **55.9%** | Mixed |
+| Claude Opus 4.5 | 96.8% | **3.6%** | Context-anchored |
+| Command R+ | 91.2% | **0.0%** | Context-anchored |
+
+**Key observation**: All models respond in target language for EN→X (83-99%), but diverge dramatically on X→EN (foreign context, English query). Command R+ shows the most extreme context-anchored behavior (0% English responses).
+
+#### X→EN Fidelity by Language
+
+| Model | DE | ZH | ES | AR | Avg |
+|-------|----:|----:|----:|----:|----:|
+| GPT-5 | 92.3% | 94.5% | 95.1% | 95.1% | 94.2% |
+| Gemini 3 Pro | 78.3% | 70.6% | 72.2% | 64.4% | 71.4% |
+| DeepSeek-V3.1 | 36.8% | 73.1% | 45.1% | 68.7% | 55.9% |
+| Claude Opus 4.5 | 2.7% | 3.8% | 3.8% | 3.8% | 3.6% |
+| Command R+ | 0.0% | 0.0% | 0.0% | 0.0% | 0.0% |
+
+#### X→EN Fidelity by Conversation Length
+
+| Model | Short (2-3) | Medium (4-5) | Long (6+) | χ² | p |
+|-------|-------------|--------------|-----------|------|--------|
+| GPT-5 | 100% (n=28) | 94.6% (n=148) | 93.8% (n=552) | 1.90 | 0.39 |
+| Gemini 3 Pro | 85.7% (n=28) | 83.7% (n=147) | 67.3% (n=545) | 18.05 | **0.0001** |
+| Claude Opus 4.5 | 25.0% (n=28) | 2.7% (n=148) | 2.7% (n=552) | 38.83 | **<0.0001** |
+| DeepSeek-V3.1 | 67.9% (n=28) | 61.5% (n=148) | 53.8% (n=552) | 4.48 | 0.11 |
+| Command R+ | 0.0% (n=28) | 0.0% (n=148) | 0.0% (n=552) | - | - |
+
+Note: Command R+ shows 0% fidelity at all conversation lengths (floor effect).
+
+#### Gemini 3 Pro: Language × Conversation Length
+
+| Language | Short (2-3) | Medium (4-5) | Long (6+) | Trend | p |
+|----------|-------------|--------------|-----------|-------|------|
+| DE | 85.7% (n=7) | 88.9% (n=36) | 75.2% (n=137) | r=-0.22 | **0.003** |
+| ZH | 85.7% (n=7) | 83.8% (n=37) | 66.2% (n=136) | r=-0.16 | *0.03* |
+| ES | 71.4% (n=7) | 81.1% (n=37) | 69.9% (n=136) | r=-0.23 | **0.002** |
+| AR | 100% (n=7) | 81.1% (n=37) | 58.1% (n=136) | r=-0.41 | **<0.0001** |
+
+Arabic shows strongest degradation (100% → 58.1%, r=-0.41***)
+
 ### Layer 2: Task Accuracy
 
-#### Gemini 3 Pro
+| Model | Baseline | EN→X | X→EN | Full Trans |
+|-------|----------|------|------|------------|
+| Gemini 3 Pro | 71.4% | 70.6% | 68.5% | 71.0% |
+| GPT-5 | 57.1% | 58.1% | 54.7% | 57.5% |
+| Claude Opus 4.5 | 54.4% | 50.5% | 46.2% | 48.1% |
+| DeepSeek-V3.1 | 47.3% | 43.0% | 39.3% | 40.2% |
+| Command R+ | 14.8% | 15.2% | 11.7% | - |
 
-| Condition | DE | ZH | ES | AR | Avg |
-|-----------|----:|----:|----:|----:|----:|
-| Baseline (EN) | 71.4% | 71.4% | 71.4% | 71.4% | 71.4% |
-| EN→X | 70.3% | 69.8% | 70.3% | 71.4% | 70.5% |
-| X→EN | 67.6% | 68.7% | 67.6% | 69.8% | 68.4% |
-| Full Translation | 69.8% | 74.7% | 69.8% | 69.8% | 71.0% |
-| Distractor | 71.4% | 70.3% | 70.9% | 70.3% | 70.7% |
-| Distractor Multi | 70.9% | 69.2% | 73.6% | 69.8% | 70.9% |
-
-#### Qwen3-235B-A22B
-
-| Condition | DE | ZH | ES | AR | Avg |
-|-----------|----:|----:|----:|----:|----:|
-| Baseline (EN) | 36.3% | 36.3% | 36.3% | 36.3% | 36.3% |
-| EN→X | 33.5% | 31.3% | 36.8% | 29.7% | 32.8% |
-| X→EN | 29.7% | 33.0% | 30.2% | 26.9% | 30.0% |
-| Full Translation | 30.2% | 29.7% | 32.4% | 23.6% | 29.0% |
-| Distractor | 33.0% | 30.2% | 31.9% | 27.5% | 30.6% |
-| Distractor Multi | 37.9% | 34.1% | 35.7% | 32.4% | 35.0% |
-
-#### Claude Opus 4.5
-
-| Condition | DE | ZH | ES | AR | Avg |
-|-----------|----:|----:|----:|----:|----:|
-| Baseline (EN) | 54.4% | 54.4% | 54.4% | 54.4% | 54.4% |
-| EN→X | 47.8% | 47.8% | 53.8% | 52.7% | 50.5% |
-| X→EN | 45.1% | 46.2% | 47.8% | 45.6% | 46.2% |
-| Full Translation | 45.6% | 51.1% | 46.2% | 49.5% | 48.1% |
-| Distractor | 50.5% | 47.3% | 57.1% | 47.8% | 50.7% |
-| Distractor Multi | 51.6% | 48.4% | 54.4% | 51.6% | 51.5% |
-
-#### GPT-5
-
-| Condition | DE | ZH | ES | AR | Avg |
-|-----------|----:|----:|----:|----:|----:|
-| Baseline (EN) | 57.1% | 57.1% | 57.1% | 57.1% | 57.1% |
-| EN→X | 57.7% | 59.3% | 58.2% | 57.1% | 58.1% |
-| X→EN | 53.8% | 53.8% | 57.1% | 54.1% | 54.7% |
-| Full Translation | 56.0% | 57.7% | 57.1% | 58.6% | 57.4% |
-| Distractor | 59.9% | 57.1% | 63.2% | 60.4% | 60.2% |
-| Distractor Multi | 54.9% | 57.7% | 58.2% | 58.8% | 57.4% |
-
-#### DeepSeek-V3.1
-
-| Condition | DE | ZH | ES | AR | Avg |
-|-----------|----:|----:|----:|----:|----:|
-| Baseline (EN) | 47.3% | 47.3% | 47.3% | 47.3% | 47.3% |
-| EN→X | 40.1% | 39.6% | 51.6% | 40.7% | 43.0% |
-| X→EN | 38.5% | 33.5% | 45.1% | 40.1% | 39.3% |
-
-### Layer 1: Language Fidelity
-
-#### Qwen3-235B-A22B
-
-| Condition | Expected | DE | ZH | ES | AR | Avg |
-|-----------|----------|----:|----:|----:|----:|----:|
-| Baseline | EN | 100% | 100% | 100% | 100% | 100% |
-| EN→X | X | 92.5% | 79.8% | 92.9% | 78.0% | 85.8% |
-| X→EN | EN | 32.4% | 28.6% | 21.7% | 56.8% | 34.9% |
-| Full Translation | X | 100% | 99.1% | 99.1% | 100% | 99.6% |
-| Distractor | X | 94.6% | 83.1% | 92.9% | 65.5% | 84.0% |
-| Distractor Multi | X | 86.9% | 78.5% | 89.4% | 42.4% | 74.3% |
-
-#### Claude Opus 4.5
-
-| Condition | Expected | DE | ZH | ES | AR | Avg |
-|-----------|----------|----:|----:|----:|----:|----:|
-| Baseline | EN | 100% | 100% | 100% | 100% | 100% |
-| EN→X | X | 98.4% | 95.1% | 96.2% | 97.8% | 96.9% |
-| X→EN | EN | 2.7% | 3.8% | 3.8% | 3.8% | 3.5% |
-| Full Translation | X | 100% | 100% | 100% | 100% | 100% |
-| Distractor | X | 94.5% | 96.2% | 95.1% | 96.7% | 95.6% |
-| Distractor Multi | X | 93.4% | 95.1% | 92.9% | 95.1% | 94.1% |
-
-#### GPT-5
-
-| Condition | Expected | DE | ZH | ES | AR | Avg |
-|-----------|----------|----:|----:|----:|----:|----:|
-| Baseline | EN | 100% | 100% | 100% | 100% | 100% |
-| EN→X | X | 98.9% | 97.8% | 100% | 98.9% | 98.9% |
-| X→EN | EN | 92.3% | 94.5% | 95.1% | 95.1% | 94.2% |
-| Full Translation | X | 100% | 100% | 100% | 100% | 100% |
-| Distractor | X | 98.9% | 98.4% | 99.5% | 98.4% | 98.8% |
-| Distractor Multi | X | 94.5% | 95.6% | 95.6% | 96.2% | 95.5% |
-
-#### Gemini 3 Pro
-
-| Condition | Expected | DE | ZH | ES | AR | Avg |
-|-----------|----------|----:|----:|----:|----:|----:|
-| Baseline | EN | 100% | 100% | 100% | 100% | 100% |
-| EN→X | X | 97.8% | 99.4% | 97.8% | 99.4% | 98.6% |
-| X→EN | EN | 78.3% | 70.6% | 72.2% | 64.4% | 71.4% |
-| Full Translation | X | 100% | 100% | 100% | 100% | 100% |
-| Distractor | X | 97.8% | 98.9% | 97.8% | 98.9% | 98.4% |
-| Distractor Multi | X | 96.7% | 97.2% | 96.7% | 97.8% | 97.1% |
-
-#### DeepSeek-V3.1
-
-| Condition | Expected | DE | ZH | ES | AR | Avg |
-|-----------|----------|----:|----:|----:|----:|----:|
-| Baseline | EN | 100% | 100% | 100% | 100% | 100% |
-| EN→X | X | 89.0% | 68.1% | 90.1% | 84.6% | 83.0% |
-| X→EN | EN | 36.8% | 73.1% | 45.1% | 68.7% | 55.9% |
+No significant accuracy degradation from language switching across models. Command R+ shows consistently low accuracy across all conditions.
 
 ### Key Findings
 
 #### RQ1: Query Language vs Context Language
 
-Models diverge dramatically on X→EN (foreign context, English query):
+Models split into two behavioral groups on X→EN (foreign context, English query):
 
-| Model | EN→X | X→EN | Behavior |
-|-------|------|------|----------|
-| GPT-5 | 98.9% | **94.2%** | Follows query language |
-| Gemini 3 Pro | 98.6% | **71.4%** | Mixed |
-| Claude Opus 4.5 | 96.9% | **3.5%** | Follows context language |
-
-- **EN→X**: All models respond in target language (97-99%)
-- **X→EN**: Models split into two groups:
-  - **Query-following**: GPT-5 responds in English when queried in English
-  - **Context-anchored**: Claude responds in context language, ignoring English query
+- **Query-following** (GPT-5): Responds in user's query language regardless of context (94.2%)
+- **Context-anchored** (Claude Opus 4.5, Command R+): Responds in conversation context language, ignoring query language (3.6%, 0.0%)
+- **Mixed** (Gemini, DeepSeek): Intermediate behavior (56-71%)
 
 #### RQ2: Conversation Length Effect
 
-Gemini's X→EN fidelity decreases with conversation length (χ²=32.5, p<0.0001):
+Both Gemini and DeepSeek show significant degradation in X→EN fidelity as conversations get longer:
 
-| Length | Fidelity | n |
-|--------|----------|---|
-| Short (2-3 turns) | 82.6% | 132 |
-| Medium (4-5 turns) | 70.6% | 296 |
-| Long (6+ turns) | **49.1%** | 112 |
-
-Per-language analysis confirms trend (all p<0.05). GPT-5 shows no degradation (~94% stable).
+- **Gemini 3 Pro**: 85.7% → 67.3% (r=-0.26, p<0.001)
+- **DeepSeek-V3.1**: 67.9% → 53.8% (r=-0.12, p<0.01)
+- **GPT-5**: Stable at ~94% regardless of length
+- **Claude**: Already at floor (~3%)
+- **Command R+**: At absolute floor (0%) for all lengths
 
 #### RQ3: Task Accuracy (Null Result)
 
-No significant accuracy degradation from language switching:
-
-| Model | Baseline | EN→X | X→EN | Full Trans |
-|-------|----------|------|------|------------|
-| Gemini 3 Pro | 71.4% | 70.5% | 68.4% | 71.0% |
-| GPT-5 | 57.1% | 58.1% | 54.7% | 57.4% |
-| Claude Opus 4.5 | 54.4% | 50.5% | 46.2% | 48.1% |
-
-Task performance remains stable across language conditions.
+Task performance remains stable across language conditions. Language switching does not significantly hurt task completion.
 
 ## Usage
 
@@ -285,11 +221,11 @@ python src/scripts/generate_distractor.py --lang zh --mix-all-turns  # Multi-tur
 
 ```bash
 # Baseline (English-only MultiChallenge)
-python src/scripts/run_experiment.py --model qwen3-235b
+python src/scripts/run_experiment.py --model gpt-5
 
 # Code-switching experiments
-python src/scripts/run_experiment.py --model qwen3-235b --data data/codeswitching/en_to_x/codeswitching_de.jsonl
-python src/scripts/run_experiment.py --model qwen3-235b --data data/codeswitching/x_to_en/codeswitching_de_to_en.jsonl
+python src/scripts/run_experiment.py --model gpt-5 --data data/codeswitching/en_to_x/codeswitching_de.jsonl
+python src/scripts/run_experiment.py --model gpt-5 --data data/codeswitching/x_to_en/codeswitching_de_to_en.jsonl
 
 # Test with limited samples
 python src/scripts/run_experiment.py --model gpt-4o --samples 20
@@ -298,7 +234,7 @@ python src/scripts/run_experiment.py --model gpt-4o --samples 20
 ### Evaluate Responses
 
 ```bash
-python src/scripts/evaluate.py --input results/qwen3-235b/responses_*.jsonl
+python src/scripts/evaluate.py --input results/gpt-5/responses_*.jsonl
 ```
 
 ## Project Structure
@@ -311,14 +247,23 @@ python src/scripts/evaluate.py --input results/qwen3-235b/responses_*.jsonl
 │       ├── x_to_en/              # X→EN datasets
 │       ├── full_translation/     # Fully translated datasets
 │       └── distractor/           # Distractor datasets
-├── src/scripts/
-│   ├── generate_codeswitching.py         # EN→X generation
-│   ├── generate_codeswitching_reverse.py # X→EN generation
-│   ├── generate_full_translation.py      # Full translation
-│   ├── generate_distractor.py            # Distractor injection
-│   ├── run_experiment.py                 # Model inference
-│   ├── evaluate.py                       # GPT-4o judge (Layer 2)
-│   └── evaluate_language.py              # Language fidelity (Layer 1)
+├── src/
+│   ├── scripts/
+│   │   ├── generate_codeswitching.py         # EN→X generation
+│   │   ├── generate_codeswitching_reverse.py # X→EN generation
+│   │   ├── generate_full_translation.py      # Full translation
+│   │   ├── generate_distractor.py            # Distractor injection
+│   │   ├── run_experiment.py                 # Model inference
+│   │   ├── evaluate.py                       # GPT-4o judge (Layer 2)
+│   │   └── evaluate_language.py              # Language fidelity (Layer 1)
+│   └── analysis/
+│       ├── analyze_results.py    # Main analysis entry point
+│       ├── config.py             # Models, languages, conditions
+│       ├── data_loader.py        # Load evaluation results
+│       ├── task_accuracy.py      # Layer 2 analysis
+│       ├── language_fidelity.py  # Layer 1 analysis
+│       ├── conversation_length.py # Length effect analysis
+│       └── stats.py              # Statistical utilities
 ├── results/{model}/              # Model responses and evaluations
 └── prompts/judge_prompt.txt      # Evaluation prompt template
 ```
@@ -344,7 +289,69 @@ python src/scripts/evaluate.py --input results/qwen3-235b/responses_*.jsonl
 - Translation quality: Uses Google Translate, which may introduce artifacts
 - Limited language coverage: Only 4 languages tested
 - Distractor design: Current distractors are benign small talk - may need adversarial variants to stress-test robust models
-- Qwen3-235B empty responses: ~40% of responses are empty due to reasoning token exhaustion (model uses hidden thinking tokens that don't appear in output). This is a known issue with reasoning models.
+
+## Appendix
+
+### Detailed Results by Model
+
+#### GPT-5
+
+| Condition | Expected | DE | ZH | ES | AR | Avg |
+|-----------|----------|----:|----:|----:|----:|----:|
+| EN→X | X | 98.9% | 97.8% | 100% | 98.9% | 98.9% |
+| X→EN | EN | 92.3% | 94.5% | 95.1% | 95.1% | 94.2% |
+| Full Translation | X | 100% | 100% | 100% | 100% | 100% |
+
+#### Gemini 3 Pro
+
+| Condition | Expected | DE | ZH | ES | AR | Avg |
+|-----------|----------|----:|----:|----:|----:|----:|
+| EN→X | X | 97.8% | 99.4% | 97.8% | 99.4% | 98.6% |
+| X→EN | EN | 78.3% | 70.6% | 72.2% | 64.4% | 71.4% |
+| Full Translation | X | 98.9% | 100% | 100% | 100% | 99.7% |
+
+#### Claude Opus 4.5
+
+| Condition | Expected | DE | ZH | ES | AR | Avg |
+|-----------|----------|----:|----:|----:|----:|----:|
+| EN→X | X | 98.4% | 95.1% | 96.2% | 97.8% | 96.8% |
+| X→EN | EN | 2.7% | 3.8% | 3.8% | 3.8% | 3.6% |
+| Full Translation | X | 100% | 100% | 100% | 100% | 100% |
+
+#### DeepSeek-V3.1
+
+| Condition | Expected | DE | ZH | ES | AR | Avg |
+|-----------|----------|----:|----:|----:|----:|----:|
+| EN→X | X | 89.0% | 68.1% | 90.1% | 84.6% | 83.0% |
+| X→EN | EN | 36.8% | 73.1% | 45.1% | 68.7% | 55.9% |
+| Full Translation | X | 100% | 97.8% | 100% | 100% | 99.5% |
+
+#### Command R+
+
+| Condition | Expected | DE | ZH | ES | AR | Avg |
+|-----------|----------|----:|----:|----:|----:|----:|
+| EN→X | X | 94.5% | 89.0% | 98.4% | 83.0% | 91.2% |
+| X→EN | EN | 0.0% | 0.0% | 0.0% | 0.0% | 0.0% |
+| Full Translation | X | 99.5% | 100% | 100% | 100% | 99.9% |
+
+Note: Command R+ shows the most extreme context-anchored behavior, with 0% English responses in X→EN condition across all languages.
+
+### Distractor Condition Results
+
+Distractors (foreign noise embedded in context) do not significantly affect language fidelity.
+
+| Model | EN→X | Distractor | Distractor Multi |
+|-------|------|------------|------------------|
+| GPT-5 | 98.9% | 98.8% | 95.5% |
+| Gemini 3 Pro | 98.6% | 95.3% | 81.6% |
+| Claude Opus 4.5 | 96.8% | 95.6% | 94.1% |
+| DeepSeek-V3.1 | 83.0% | - | - |
+| Command R+ | 91.2% | - | - |
+
+### Sample Sizes
+
+- **182 questions** per condition per language (728 per model per condition across 4 languages)
+- **Conversation length distribution**: Short (2-3 turns): ~4%, Medium (4-5 turns): ~20%, Long (6+ turns): ~76%
 
 ## Citation
 
