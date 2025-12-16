@@ -8,20 +8,28 @@
 
 **The Question**: When a multilingual user switches languages mid-conversation, does the LLM respond in the user's new language or stick to the conversation's original language?
 
-**Example Scenario (X→EN condition)**:
+**Example Scenario (X→EN condition)** — *Real example from dataset*:
 ```
-[Turn 1] User (German):    "Ich plane eine Reise nach Paris..."
-[Turn 2] Assistant (German): "Toll! Paris ist wunderschön..."
-[Turn 3] User (German):    "Welche Hotels empfiehlst du?"
-[Turn 4] Assistant (German): "Ich empfehle das Hotel Le Marais..."
-[Turn 5] User (ENGLISH):   "What's the best restaurant near there?"  ← USER SWITCHES TO ENGLISH
-[Turn 6] Assistant:        ??? Does it respond in English or German?
+[Turn 1] User (Spanish):
+"¡Hola! Soy un experto en relaciones internacionales que trabaja en la
+sede de la ONU. Odio usar taxis o transporte público en Nueva York.
+Prefiero lugares que estén a 5 minutos a pie de la sede de la ONU."
+
+[Turn 2] Assistant (Spanish):
+"¡Hola! Aquí hay algunas sugerencias que se encuentran a 5 minutos a pie:
+1. Dag Hammarskjold Plaza: este parque público está justo enfrente..."
+
+[Turn 3] User (ENGLISH):  ← USER SWITCHES TO ENGLISH
+"I am meeting a German diplomat on Friday. I am looking for a suitable
+place to have lunch with him, preferably an up-class restaurant."
+
+[Turn 4] Assistant: ??? Does it respond in English or Spanish?
 ```
 
 **What We Found**:
 - **GPT-5**: Responds in English 94% of the time (follows user's language)
-- **Claude Opus 4.5**: Responds in German 96% of the time (follows context language)
-- **Command R+**: Responds in German 100% of the time (never follows user switch)
+- **Claude Opus 4.5**: Responds in Spanish 96% of the time (follows context language)
+- **Command R+**: Responds in Spanish 100% of the time (never follows user switch)
 
 ---
 
@@ -53,62 +61,73 @@ We test 6 experimental conditions to isolate language switching behavior. Here's
 
 #### Condition 1: Baseline (Control)
 **What**: Original English-only MultiChallenge conversations
-**Pattern**: `EN → EN → EN → EN → EN`
+**Pattern**: `EN → EN → EN`
 **Purpose**: Establish baseline task performance without any language switching
 
+*Real example from dataset:*
 ```
-User:      "I'm planning a trip to Paris for 3 days..."        [English]
-Assistant: "Great! Paris is beautiful..."                       [English]
-User:      "What hotels do you recommend?"                      [English]
-Assistant: "I recommend Hotel Le Marais..."                     [English]
-User:      "What's the best restaurant nearby?"                 [English]  ← FINAL QUERY
+User:      "Hello! I am an International relations expert working at the UN
+            headquarters. I hate using taxis in New York. I prefer venues
+            within a 5-minute walk from the UN."                           [EN]
+Assistant: "Here are a few suggestions within a 5-minute walk:
+            1. Dag Hammarskjold Plaza..."                                  [EN]
+User:      "I am meeting a German diplomat on Friday. I am looking for a
+            suitable place to have lunch with him."                        [EN]
 Expected:  [English response]
 ```
 
-#### Condition 2: EN→X (English to Foreign)
-**What**: English conversation, then user switches to foreign language at the end
-**Pattern**: `EN → EN → EN → EN → X`
+#### Condition 2: EN→X (English to Spanish)
+**What**: English conversation, then user switches to Spanish at the end
+**Pattern**: `EN → EN → ES`
 **Purpose**: Test if model follows user's language switch FROM English
 
+*Real example from dataset:*
 ```
-User:      "I'm planning a trip to Paris for 3 days..."        [English]
-Assistant: "Great! Paris is beautiful..."                       [English]
-User:      "What hotels do you recommend?"                      [English]
-Assistant: "I recommend Hotel Le Marais..."                     [English]
-User:      "Was ist das beste Restaurant in der Nähe?"          [GERMAN]  ← USER SWITCHES
-Expected:  [German response]
+User:      "Hello! I am an International relations expert working at the UN
+            headquarters. I prefer venues within a 5-minute walk from the UN." [EN]
+Assistant: "Here are a few suggestions within a 5-minute walk:
+            1. Dag Hammarskjold Plaza..."                                      [EN]
+User:      "El viernes me reuniré con un diplomático alemán. Estoy buscando
+            un lugar adecuado para almorzar con él."                           [ES] ← SWITCH
+Expected:  [Spanish response]
 ```
 
-#### Condition 3: X→EN (Foreign to English) ⭐ KEY CONDITION
-**What**: Foreign language conversation, then user switches to English at the end
-**Pattern**: `X → X → X → X → EN`
+#### Condition 3: X→EN (Spanish to English) ⭐ KEY CONDITION
+**What**: Spanish conversation, then user switches to English at the end
+**Pattern**: `ES → ES → EN`
 **Purpose**: Test if model follows user's language switch TO English (reveals behavioral divergence)
 
+*Real example from dataset:*
 ```
-User:      "Ich plane eine Reise nach Paris für 3 Tage..."     [German]
-Assistant: "Toll! Paris ist wunderschön..."                     [German]
-User:      "Welche Hotels empfiehlst du?"                       [German]
-Assistant: "Ich empfehle das Hotel Le Marais..."                [German]
-User:      "What's the best restaurant nearby?"                 [ENGLISH] ← USER SWITCHES
+User:      "¡Hola! Soy un experto en relaciones internacionales que trabaja
+            en la sede de la ONU. Prefiero lugares que estén a 5 minutos
+            a pie de la sede de la ONU."                                       [ES]
+Assistant: "¡Hola! Aquí hay algunas sugerencias a 5 minutos a pie:
+            1. Dag Hammarskjold Plaza..."                                      [ES]
+User:      "I am meeting a German diplomat on Friday. I am looking for a
+            suitable place to have lunch with him."                            [EN] ← SWITCH
 Expected:  [English response]
 ```
 
 **This is where models diverge dramatically:**
 - GPT-5: Responds in English 94% ✓
-- Claude: Responds in German 96% ✗ (ignores user's switch)
+- Claude: Responds in Spanish 96% ✗ (ignores user's switch)
 
 #### Condition 4: Full Translation
-**What**: Entire conversation in foreign language (no switching)
-**Pattern**: `X → X → X → X → X`
+**What**: Entire conversation in Spanish (no switching)
+**Pattern**: `ES → ES → ES`
 **Purpose**: Control for multilingual capability without code-switching
 
+*Real example from dataset:*
 ```
-User:      "Ich plane eine Reise nach Paris für 3 Tage..."     [German]
-Assistant: "Toll! Paris ist wunderschön..."                     [German]
-User:      "Welche Hotels empfiehlst du?"                       [German]
-Assistant: "Ich empfehle das Hotel Le Marais..."                [German]
-User:      "Was ist das beste Restaurant in der Nähe?"          [German]  ← STAYS GERMAN
-Expected:  [German response]
+User:      "¡Hola! Soy un experto en relaciones internacionales que trabaja
+            en la sede de la ONU. Prefiero lugares que estén a 5 minutos
+            a pie de la sede de la ONU."                                       [ES]
+Assistant: "¡Hola! Aquí hay algunas sugerencias a 5 minutos a pie:
+            1. Dag Hammarskjold Plaza..."                                      [ES]
+User:      "El viernes me reuniré con un diplomático alemán. Estoy buscando
+            un lugar adecuado para almorzar con él."                           [ES]
+Expected:  [Spanish response]
 ```
 
 ### 2.2 Dataset Structure
@@ -553,22 +572,22 @@ We also tested distractor conditions where foreign language "noise" is embedded 
 
 **Distractor (noise in first turn only)**
 ```
-User:      "I'm planning a trip... [Übrigens, das Wetter ist schön]"  [EN + DE noise]
-Assistant: "Great! Paris is beautiful..."                              [EN]
-User:      "What hotels do you recommend?"                             [EN]
-Assistant: "I recommend Hotel Le Marais..."                            [EN]
-User:      "Was ist das beste Restaurant?"                             [German query]
-Expected:  [German response]
+User:      "Hello! I am an International relations expert...
+            [Por cierto, el clima es agradable hoy]"              [EN + ES noise]
+Assistant: "Here are a few suggestions within a 5-minute walk..." [EN]
+User:      "El viernes me reuniré con un diplomático alemán.
+            Estoy buscando un lugar adecuado para almorzar."      [ES query]
+Expected:  [Spanish response]
 ```
 
 **Distractor Multi (noise in all user turns except last)**
 ```
-User:      "I'm planning... [Übrigens, schön]"    [EN + DE noise]
-Assistant: "Great!..."                             [EN]
-User:      "Hotels? [Das Hotel ist gut]"          [EN + DE noise]
-Assistant: "I recommend..."                        [EN]
-User:      "Was ist das beste Restaurant?"         [German query]
-Expected:  [German response]
+User:      "Hello! I work at the UN... [Por cierto, hace buen tiempo]"  [EN + ES]
+Assistant: "Here are a few suggestions..."                               [EN]
+User:      "I need a quiet place... [El lugar debe ser elegante]"       [EN + ES]
+Assistant: "I recommend..."                                              [EN]
+User:      "El viernes me reuniré con un diplomático alemán."           [ES query]
+Expected:  [Spanish response]
 ```
 
 **Finding**: Distractors do not significantly affect language fidelity. Models maintain similar behavior as non-distractor conditions.
