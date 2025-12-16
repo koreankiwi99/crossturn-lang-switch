@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
-Layer 1 Evaluation: Language Fidelity
+Layer 1 Evaluation: Language Fidelity (Parallel Version)
 
 Evaluates whether models respond in the expected language.
+Uses GPTBatcher for parallel processing.
 
 Expected language rules:
 - baseline: English (en)
@@ -14,8 +15,8 @@ Expected language rules:
 
 Usage:
     python evaluate_language.py --input results/claude-opus-4.5-openrouter/baseline/responses_*.jsonl
-    python evaluate_language.py --input results/*/codeswitching/*.jsonl --method llm
-    python evaluate_language.py --input results/qwen3-235b/ --recursive
+    python evaluate_language.py --input results/*/codeswitching/*.jsonl --method llm --workers 64
+    python evaluate_language.py --input results/qwen3-235b/ --recursive --workers 64
 """
 
 import os
@@ -28,6 +29,7 @@ from collections import defaultdict
 from dotenv import load_dotenv
 from openai import OpenAI
 from tqdm import tqdm
+from gpt_batch.batcher import GPTBatcher
 
 load_dotenv()
 
@@ -130,6 +132,12 @@ def verify_language_llm(client, response_text, expected_lang, max_chars=2000):
     """Verify if response is in expected language using LLM judge."""
     # Clean and truncate
     text = clean_response_text(response_text)
+
+    # For very short responses (< 10 chars), assume they match expected language
+    # Single words like "No", "Sí", "OK", etc. can't reliably be attributed to any language
+    if len(text.strip()) < 10:
+        return True, expected_lang
+
     text = text[:max_chars] if len(text) > max_chars else text
 
     expected_lang_name = LANG_NAMES.get(expected_lang, expected_lang)
@@ -247,14 +255,212 @@ def load_responses(input_path):
     return responses
 
 
-def evaluate_language_fidelity(responses, client, condition_type, target_lang, output_dir, method="llm"):
-    """Evaluate language fidelity for all responses."""
+def evaluate_language_fidelity_batch(responses, condition_type, target_lang, output_dir, method="verify", num_workers=64):
+    """Evaluate language fidelity for all responses using parallel GPTBatcher."""
     os.makedirs(output_dir, exist_ok=True)
 
     # Output filename includes language
     lang_suffix = f"_{target_lang}" if target_lang else ""
     output_file = f"{output_dir}/language_eval{lang_suffix}.jsonl"
     summary_file = f"{output_dir}/language_summary{lang_suffix}.json"
+
+    # Get expected language
+    expected = get_expected_language(condition_type, target_lang)
+    expected_lang_name = LANG_NAMES.get(expected, expected)
+
+    print(f"\nEvaluating language fidelity ({method}, {num_workers} workers)...")
+    print(f"Condition: {condition_type}, Target: {target_lang}, Expected: {expected}")
+    print(f"Output: {output_file}")
+    print("=" * 60)
+
+    # Filter valid responses and prepare prompts
+    valid_responses = []
+    prompts = []
+    max_chars = 2000
+
+    for item in responses:
+        if not item.get("success") or not item.get("response"):
+            continue
+
+        text = clean_response_text(item["response"])
+
+        # For very short responses, we'll handle them separately
+        if len(text.strip()) < 10:
+            valid_responses.append((item, "short"))
+            prompts.append(None)  # Placeholder
+            continue
+
+        text = text[:max_chars] if len(text) > max_chars else text
+
+        if method == "verify":
+            prompt = LANGUAGE_VERIFY_PROMPT.format(response=text, expected_lang_name=expected_lang_name)
+        else:  # llm
+            prompt = LANGUAGE_JUDGE_PROMPT.format(response=text)
+
+        valid_responses.append((item, "normal"))
+        prompts.append(prompt)
+
+    skipped = len(responses) - len(valid_responses)
+
+    # Filter out None prompts for batch processing
+    batch_indices = [i for i, p in enumerate(prompts) if p is not None]
+    batch_prompts = [prompts[i] for i in batch_indices]
+
+    print(f"Processing {len(batch_prompts)} responses with GPTBatcher...")
+
+    # Initialize batcher
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise ValueError("OPENAI_API_KEY not set in environment")
+
+    batcher = GPTBatcher(
+        api_key=api_key,
+        model_name=JUDGE_MODEL,
+        system_prompt="",
+        temperature=0,
+        num_workers=num_workers,
+        timeout_duration=30,
+        retry_attempts=2,
+    )
+
+    # Run batch
+    batch_results = batcher.handle_message_list(batch_prompts) if batch_prompts else []
+
+    # Map results back
+    batch_result_map = {batch_indices[i]: batch_results[i] for i in range(len(batch_results))}
+
+    # Process results
+    stats = {
+        "total": 0,
+        "match": 0,
+        "mismatch": 0,
+        "mixed": 0,
+        "error": 0,
+        "skipped": skipped,
+    }
+    detected_distribution = defaultdict(int)
+    results = []
+
+    for i, (item, item_type) in enumerate(valid_responses):
+        stats["total"] += 1
+
+        if item_type == "short":
+            # Short responses assumed to match
+            detected = expected
+            match_status = "match"
+            stats["match"] += 1
+        else:
+            judge_text = batch_result_map.get(i, "")
+
+            if method == "verify":
+                if judge_text is None or judge_text.strip() == "":
+                    detected = "error"
+                    match_status = "error"
+                    stats["error"] += 1
+                elif "yes" in judge_text.lower():
+                    detected = expected
+                    match_status = "match"
+                    stats["match"] += 1
+                else:
+                    detected = "other"
+                    match_status = "mismatch"
+                    stats["mismatch"] += 1
+            else:  # llm method
+                if judge_text is None or judge_text.strip() == "":
+                    detected = "error"
+                    match_status = "error"
+                    stats["error"] += 1
+                else:
+                    detected = judge_text.strip().lower()
+                    # Normalize
+                    if detected in ["en", "english"]:
+                        detected = "en"
+                    elif detected in ["de", "german", "deutsch"]:
+                        detected = "de"
+                    elif detected in ["es", "spanish", "español"]:
+                        detected = "es"
+                    elif detected in ["ar", "arabic"]:
+                        detected = "ar"
+                    elif detected in ["zh", "zh-cn", "chinese", "中文"]:
+                        detected = "zh"
+                    elif "mixed" in detected:
+                        detected = "mixed"
+
+                    if detected == "mixed":
+                        match_status = "mixed"
+                        stats["mixed"] += 1
+                    elif detected == expected:
+                        match_status = "match"
+                        stats["match"] += 1
+                    else:
+                        match_status = "mismatch"
+                        stats["mismatch"] += 1
+
+        detected_distribution[detected] += 1
+
+        result = {
+            "question_id": item.get("question_id"),
+            "expected_language": expected,
+            "detected_language": detected,
+            "match_status": match_status,
+            "response_preview": item["response"][:200] + "..." if len(item["response"]) > 200 else item["response"],
+        }
+        results.append(result)
+
+    # Write results
+    with open(output_file, 'w', encoding='utf-8') as f:
+        for result in results:
+            f.write(json.dumps(result, ensure_ascii=False) + "\n")
+
+    # Calculate rates
+    fidelity_rate = stats["match"] / max(stats["total"], 1) * 100
+
+    summary = {
+        "condition_type": condition_type,
+        "target_language": target_lang,
+        "expected_response_language": expected,
+        "method": method,
+        "judge_model": JUDGE_MODEL,
+        "num_workers": num_workers,
+        "stats": stats,
+        "fidelity_rate": fidelity_rate,
+        "detected_distribution": dict(detected_distribution),
+        "output_file": output_file,
+    }
+
+    with open(summary_file, 'w', encoding='utf-8') as f:
+        json.dump(summary, f, indent=2)
+
+    # Print summary
+    print("\n" + "=" * 60)
+    print("LANGUAGE FIDELITY RESULTS")
+    print("=" * 60)
+    print(f"Expected: {expected}")
+    print(f"Fidelity: {stats['match']}/{stats['total']} ({fidelity_rate:.1f}%)")
+    print(f"Mismatched: {stats['mismatch']}, Mixed: {stats['mixed']}, Errors: {stats['error']}")
+
+    print("\nDetected Distribution:")
+    for lang, count in sorted(detected_distribution.items(), key=lambda x: -x[1]):
+        pct = count / stats["total"] * 100 if stats["total"] > 0 else 0
+        print(f"  {lang}: {count} ({pct:.1f}%)")
+
+    print(f"\nResults: {output_file}")
+    print(f"Summary: {summary_file}")
+
+    return summary
+
+
+def evaluate_language_fidelity(responses, client, condition_type, target_lang, output_dir, method="llm"):
+    """Evaluate language fidelity for all responses (sequential, deprecated)."""
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Output filename includes language
+    lang_suffix = f"_{target_lang}" if target_lang else ""
+    output_file = f"{output_dir}/language_eval{lang_suffix}.jsonl"
+    summary_file = f"{output_dir}/language_summary{lang_suffix}.json"
+
+    # Clear output file before starting (avoid accumulating results from multiple runs)
+    open(output_file, 'w').close()
 
     # Get expected language
     expected = get_expected_language(condition_type, target_lang)
@@ -396,6 +602,9 @@ def main():
     parser.add_argument("--recursive", action="store_true",
                        help="Process all response files in directory recursively")
 
+    parser.add_argument("--workers", type=int, default=64,
+                       help="Number of parallel workers (default: 64)")
+
     args = parser.parse_args()
 
     # Get input files
@@ -409,12 +618,11 @@ def main():
         sys.exit(1)
 
     print("=" * 60)
-    print("LAYER 1 EVALUATION: Language Fidelity")
+    print("LAYER 1 EVALUATION: Language Fidelity (Parallel)")
     print("=" * 60)
     print(f"Files to process: {len(input_files)}")
     print(f"Method: {args.method}")
-
-    client = get_openai_client() if args.method in ["llm", "verify"] else None
+    print(f"Workers: {args.workers}")
 
     all_summaries = []
 
@@ -431,9 +639,18 @@ def main():
 
         output_dir = os.path.dirname(input_file)
 
-        summary = evaluate_language_fidelity(
-            responses, client, condition_type, target_lang, output_dir, args.method
-        )
+        if args.method == "fasttext":
+            # Use sequential for fasttext (no API calls)
+            client = None
+            summary = evaluate_language_fidelity(
+                responses, client, condition_type, target_lang, output_dir, args.method
+            )
+        else:
+            # Use parallel batch processing for LLM methods
+            summary = evaluate_language_fidelity_batch(
+                responses, condition_type, target_lang, output_dir, args.method, args.workers
+            )
+
         all_summaries.append({
             "file": input_file,
             "condition": condition_type,
