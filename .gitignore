@@ -2,7 +2,6 @@
 reimplementation/
 
 # Large directories
-results/
 pdf/
 
 # Data - only track translations/ and experiments/
