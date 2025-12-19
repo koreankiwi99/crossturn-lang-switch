@@ -1,0 +1,22 @@
+{
+  "condition_type": "full_translation",
+  "target_language": "zh",
+  "expected_response_language": "zh",
+  "method": "verify",
+  "judge_model": "gpt-4o-mini",
+  "num_workers": 64,
+  "stats": {
+    "total": 182,
+    "match": 179,
+    "mismatch": 3,
+    "mixed": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "fidelity_rate": 98.35164835164835,
+  "detected_distribution": {
+    "zh": 179,
+    "other": 3
+  },
+  "output_file": "results/responses/deepseek-v3.1/language_eval_baseline_zh_20251219_213412.jsonl"
+}

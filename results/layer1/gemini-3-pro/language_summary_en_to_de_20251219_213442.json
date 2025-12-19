@@ -1,0 +1,22 @@
+{
+  "condition_type": "codeswitching",
+  "target_language": "de",
+  "expected_response_language": "de",
+  "method": "verify",
+  "judge_model": "gpt-4o-mini",
+  "num_workers": 64,
+  "stats": {
+    "total": 180,
+    "match": 177,
+    "mismatch": 3,
+    "mixed": 0,
+    "error": 0,
+    "skipped": 2
+  },
+  "fidelity_rate": 98.33333333333333,
+  "detected_distribution": {
+    "de": 177,
+    "other": 3
+  },
+  "output_file": "results/responses/gemini-3-pro/language_eval_en_to_de_20251219_213442.jsonl"
+}

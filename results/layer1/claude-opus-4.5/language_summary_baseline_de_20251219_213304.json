@@ -1,0 +1,22 @@
+{
+  "condition_type": "full_translation",
+  "target_language": "de",
+  "expected_response_language": "de",
+  "method": "verify",
+  "judge_model": "gpt-4o-mini",
+  "num_workers": 64,
+  "stats": {
+    "total": 181,
+    "match": 179,
+    "mismatch": 2,
+    "mixed": 0,
+    "error": 0,
+    "skipped": 1
+  },
+  "fidelity_rate": 98.89502762430939,
+  "detected_distribution": {
+    "other": 2,
+    "de": 179
+  },
+  "output_file": "results/responses/claude-opus-4.5/language_eval_baseline_de_20251219_213304.jsonl"
+}

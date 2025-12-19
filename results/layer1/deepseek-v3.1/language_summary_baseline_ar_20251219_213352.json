@@ -1,0 +1,22 @@
+{
+  "condition_type": "full_translation",
+  "target_language": "ar",
+  "expected_response_language": "ar",
+  "method": "verify",
+  "judge_model": "gpt-4o-mini",
+  "num_workers": 64,
+  "stats": {
+    "total": 182,
+    "match": 180,
+    "mismatch": 2,
+    "mixed": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "fidelity_rate": 98.9010989010989,
+  "detected_distribution": {
+    "ar": 180,
+    "other": 2
+  },
+  "output_file": "results/responses/deepseek-v3.1/language_eval_baseline_ar_20251219_213352.jsonl"
+}
