@@ -8,15 +8,17 @@
 
 **The Question**: When a multilingual user switches languages mid-conversation, does the LLM respond in the user's new language or stick to the conversation's original language?
 
-**Example Scenario (X→EN condition)** — *Real example from dataset*:
+**Example Scenario (X→EN condition)** — *Real example from dataset (GPT-4o-mini verified)*:
 ```
 [Turn 1] User (Spanish):
 "¡Hola! Soy un experto en relaciones internacionales que trabaja en la
-sede de la ONU. Odio usar taxis o transporte público en Nueva York.
-Prefiero lugares que estén a 5 minutos a pie de la sede de la ONU."
+sede de la ONU. Mi trabajo requiere que me reúna constantemente con
+diplomáticos de varios países. Prefiero lugares que estén a 5 minutos
+a pie de la sede de la ONU."
 
 [Turn 2] Assistant (Spanish):
-"¡Hola! Aquí hay algunas sugerencias que se encuentran a 5 minutos a pie:
+"¡Hola! Es fantástico saber que estás buscando lugares cerca de la sede
+de la ONU en Nueva York. Aquí hay algunas sugerencias a 5 minutos a pie:
 1. Dag Hammarskjold Plaza: este parque público está justo enfrente..."
 
 [Turn 3] User (ENGLISH):  ← USER SWITCHES TO ENGLISH
@@ -97,13 +99,13 @@ Expected:  [Spanish response]
 **Pattern**: `ES → ES → EN`
 **Purpose**: Test if model follows user's language switch TO English (reveals behavioral divergence)
 
-*Real example from dataset:*
+*Real example from dataset (GPT-4o-mini verified):*
 ```
 User:      "¡Hola! Soy un experto en relaciones internacionales que trabaja
-            en la sede de la ONU. Prefiero lugares que estén a 5 minutos
-            a pie de la sede de la ONU."                                       [ES]
-Assistant: "¡Hola! Aquí hay algunas sugerencias a 5 minutos a pie:
-            1. Dag Hammarskjold Plaza..."                                      [ES]
+            en la sede de la ONU. Mi trabajo requiere que me reúna
+            constantemente con diplomáticos de varios países."                 [ES]
+Assistant: "¡Hola! Es fantástico saber que estás buscando lugares cerca
+            de la sede de la ONU. Aquí hay algunas sugerencias..."             [ES]
 User:      "I am meeting a German diplomat on Friday. I am looking for a
             suitable place to have lunch with him."                            [EN] ← SWITCH
 Expected:  [English response]
