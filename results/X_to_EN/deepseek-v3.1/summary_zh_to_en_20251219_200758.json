@@ -1,0 +1,26 @@
+{
+  "model": "deepseek-v3.1",
+  "judge_model": "gpt-4o-2024-08-06",
+  "timestamp": "20251219_200758",
+  "stats": {
+    "total": 182,
+    "passed": 68,
+    "failed": 114,
+    "error": 0,
+    "skipped": 0
+  },
+  "pass_rate": 37.362637362637365,
+  "axis_stats": {
+    "INSTRUCTION_RETENTION": {
+      "total": 69,
+      "passed": 23,
+      "pass_rate": 33.33333333333333
+    },
+    "INFERENCE_MEMORY": {
+      "total": 113,
+      "passed": 45,
+      "pass_rate": 39.823008849557525
+    }
+  },
+  "evaluated_file": "results/deepseek-v3.1/evaluated_zh_to_en_20251219_200758.jsonl"
+}
