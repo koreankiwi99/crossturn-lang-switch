@@ -1,0 +1,35 @@
+Compare the original English conversation with its {target_language} translation.
+
+Assess whether each turn accurately conveys the original meaning. Focus on:
+- Entity accuracy (names, places, activities, objects)
+- Numerical accuracy (dates, times, quantities)
+- Constraint compliance (formatting requirements)
+- Semantic fidelity (meaning preservation)
+
+Output JSON:
+{{
+  "accurate": <true if translation is accurate, false if corrections needed>,
+  "issues": [
+    {{
+      "turn": <turn number>,
+      "description": "<what is wrong>",
+      "original": "<original text>",
+      "translated": "<incorrect translation>",
+      "corrected": "<fixed translation>"
+    }}
+  ],
+  "corrected_conversation": [
+    {{"role": "user", "content": "<content>"}},
+    {{"role": "assistant", "content": "<content>"}},
+    ...
+  ]
+}}
+
+The corrected_conversation must have exactly {turn_count} turns.
+If accurate, corrected_conversation should be a copy of the translated conversation.
+
+ORIGINAL (English):
+{original_conversation}
+
+TRANSLATED ({target_language}):
+{translated_conversation}

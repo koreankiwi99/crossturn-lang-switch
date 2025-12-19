@@ -1,0 +1,14 @@
+Is this text written in {expected_lang_name}?
+
+<TEXT>
+{response}
+</TEXT>
+
+Rules:
+- Words like "No", "OK" exist in multiple languages - consider them valid in the expected language
+- Ignore code snippets, URLs, or proper nouns
+- Focus on the main content language
+
+Return ONLY: YES or NO
+
+Your answer:

@@ -1,0 +1,14 @@
+Identify the PRIMARY language of this text.
+
+<TEXT>
+{response}
+</TEXT>
+
+Rules:
+- If the text is >90% in one language, return that language code
+- If genuinely mixed (significant portions in multiple languages), return "mixed"
+- Focus on the main content, ignore code snippets or proper nouns
+
+Return ONLY one of these codes: en, de, es, ar, zh, mixed
+
+Your answer:
