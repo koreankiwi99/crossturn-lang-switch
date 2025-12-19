@@ -5,6 +5,20 @@ reimplementation/
 results/
 pdf/
 
+# Data - only track translations/ and experiments/
+data/archive/
+data/google-translate/
+data/experiments_filtered/
+data/codeswitching/
+data/codeswitching_clean/
+data/codeswitching_verified/
+
+# Deprecated scripts
+src/scripts/archive/
+
+# Temp/experimental scripts
+tmp/
+
 # Documentation
 docs/
 
