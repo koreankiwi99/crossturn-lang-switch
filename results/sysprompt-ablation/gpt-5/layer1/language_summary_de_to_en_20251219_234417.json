@@ -1,0 +1,22 @@
+{
+  "condition_type": "codeswitching_reverse",
+  "target_language": "de",
+  "expected_response_language": "en",
+  "method": "verify",
+  "judge_model": "gpt-4o-mini",
+  "num_workers": 64,
+  "stats": {
+    "total": 182,
+    "match": 171,
+    "mismatch": 11,
+    "mixed": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "fidelity_rate": 93.95604395604396,
+  "detected_distribution": {
+    "en": 171,
+    "other": 11
+  },
+  "output_file": "results/sysprompt-ablation/gpt-5/language_eval_de_to_en_20251219_234417.jsonl"
+}

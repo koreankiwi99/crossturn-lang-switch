@@ -1,0 +1,22 @@
+{
+  "condition_type": "codeswitching",
+  "target_language": "ar",
+  "expected_response_language": "ar",
+  "method": "verify",
+  "judge_model": "gpt-4o-mini",
+  "num_workers": 64,
+  "stats": {
+    "total": 182,
+    "match": 151,
+    "mismatch": 31,
+    "mixed": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "fidelity_rate": 82.96703296703298,
+  "detected_distribution": {
+    "other": 31,
+    "ar": 151
+  },
+  "output_file": "results/command-r-plus/language_eval_en_to_ar_20251220_074216.jsonl"
+}

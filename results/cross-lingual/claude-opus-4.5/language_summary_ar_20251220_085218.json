@@ -1,0 +1,22 @@
+{
+  "condition_type": "cross_lingual",
+  "target_language": "ar",
+  "expected_response_language": "ar",
+  "method": "verify",
+  "judge_model": "gpt-4o-mini",
+  "num_workers": 64,
+  "stats": {
+    "total": 182,
+    "match": 148,
+    "mismatch": 34,
+    "mixed": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "fidelity_rate": 81.31868131868131,
+  "detected_distribution": {
+    "other": 34,
+    "ar": 148
+  },
+  "output_file": "results/cross-lingual/claude-opus-4.5/language_eval_ar_20251220_085218.jsonl"
+}

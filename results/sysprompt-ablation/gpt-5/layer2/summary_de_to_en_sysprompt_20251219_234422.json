@@ -1,0 +1,26 @@
+{
+  "model": "gpt-5",
+  "judge_model": "gpt-4o-2024-08-06",
+  "timestamp": "20251219_234422",
+  "stats": {
+    "total": 182,
+    "passed": 100,
+    "failed": 82,
+    "error": 0,
+    "skipped": 0
+  },
+  "pass_rate": 54.94505494505495,
+  "axis_stats": {
+    "INSTRUCTION_RETENTION": {
+      "total": 69,
+      "passed": 35,
+      "pass_rate": 50.72463768115942
+    },
+    "INFERENCE_MEMORY": {
+      "total": 113,
+      "passed": 65,
+      "pass_rate": 57.52212389380531
+    }
+  },
+  "evaluated_file": "results/sysprompt-ablation/gpt-5/evaluated_de_to_en_sysprompt_20251219_234422.jsonl"
+}

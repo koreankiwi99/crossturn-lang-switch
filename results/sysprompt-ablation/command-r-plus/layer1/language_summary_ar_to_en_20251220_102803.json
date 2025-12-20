@@ -1,0 +1,22 @@
+{
+  "condition_type": "codeswitching_reverse",
+  "target_language": "ar",
+  "expected_response_language": "en",
+  "method": "verify",
+  "judge_model": "gpt-4o-mini",
+  "num_workers": 64,
+  "stats": {
+    "total": 182,
+    "match": 1,
+    "mismatch": 181,
+    "mixed": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "fidelity_rate": 0.5494505494505495,
+  "detected_distribution": {
+    "other": 181,
+    "en": 1
+  },
+  "output_file": "results/sysprompt-ablation/command-r-plus/responses/language_eval_ar_to_en_20251220_102803.jsonl"
+}

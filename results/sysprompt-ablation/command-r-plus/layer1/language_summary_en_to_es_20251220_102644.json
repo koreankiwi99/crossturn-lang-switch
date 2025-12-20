@@ -1,0 +1,22 @@
+{
+  "condition_type": "codeswitching",
+  "target_language": "es",
+  "expected_response_language": "es",
+  "method": "verify",
+  "judge_model": "gpt-4o-mini",
+  "num_workers": 64,
+  "stats": {
+    "total": 182,
+    "match": 176,
+    "mismatch": 6,
+    "mixed": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "fidelity_rate": 96.7032967032967,
+  "detected_distribution": {
+    "other": 6,
+    "es": 176
+  },
+  "output_file": "results/sysprompt-ablation/command-r-plus/responses/language_eval_en_to_es_20251220_102644.jsonl"
+}

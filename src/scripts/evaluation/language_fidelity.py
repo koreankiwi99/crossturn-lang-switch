@@ -46,8 +46,8 @@ LANG_NAMES = {
     "zh": "Chinese",
 }
 
-# Load prompts from files
-PROMPTS_DIR = Path(__file__).parent.parent.parent / "prompts"
+# Load prompts from files (go up 4 levels: evaluation -> scripts -> src -> project_root)
+PROMPTS_DIR = Path(__file__).parent.parent.parent.parent / "prompts"
 
 def load_prompt(filename):
     """Load prompt from file."""
@@ -184,6 +184,7 @@ def get_expected_language(condition_type, target_lang):
 def infer_condition_type(filepath):
     """Infer condition type from filepath."""
     path_lower = filepath.lower()
+    filename = os.path.basename(filepath).lower()
 
     if "distractor_multi" in path_lower or ("distractor" in path_lower and "multi" in path_lower):
         return "distractor_multi"
@@ -191,23 +192,63 @@ def infer_condition_type(filepath):
         return "distractor"
     elif "codeswitching_reverse" in path_lower or "_to_en" in path_lower:
         return "codeswitching_reverse"
+    elif "en_to_" in filename:
+        # EN→X codeswitching (e.g., responses_en_to_de_*.jsonl)
+        return "codeswitching"
     elif "codeswitching" in path_lower:
         return "codeswitching"
     elif "full_translation" in path_lower:
         return "full_translation"
+    elif "baseline_en" in filename or filename.startswith("responses_2"):
+        # English baseline only (baseline_en or just timestamp)
+        return "baseline"
+    elif "baseline_" in filename:
+        # baseline_ar/de/es/zh are full translations (not English baseline)
+        return "full_translation"
     elif "baseline" in path_lower:
         return "baseline"
+    # Cross-lingual: X→Y where neither is English (e.g., de_to_zh, es_to_ar)
+    elif "_to_" in filename:
+        return "cross_lingual"
     else:
-        # Check filename
-        filename = os.path.basename(filepath)
-        if filename.startswith("responses_2"):  # responses_20251212... format (baseline)
-            return "baseline"
         return "unknown"
 
 
-def extract_target_language(filepath):
-    """Extract target language from response filename or path."""
+def extract_dataset_name(filepath):
+    """Extract dataset name from response filename (e.g., baseline_en, en_to_de, ar_to_en)."""
     filename = os.path.basename(filepath)
+
+    # List of known dataset patterns
+    datasets = [
+        "baseline_en", "baseline_ar", "baseline_de", "baseline_es", "baseline_zh",
+        "en_to_ar", "en_to_de", "en_to_es", "en_to_zh",
+        "ar_to_en", "de_to_en", "es_to_en", "zh_to_en"
+    ]
+
+    for ds in datasets:
+        if ds in filename:
+            return ds
+
+    return None
+
+
+def extract_target_language(filepath):
+    """Extract target language from response filename or path.
+
+    For cross-lingual patterns (X_to_Y), returns Y (the query/target language).
+    """
+    filename = os.path.basename(filepath)
+
+    # Cross-lingual pattern: {lang1}_to_{lang2} - return lang2 (query language)
+    import re
+    cross_lingual_match = re.search(r'_(de|es|ar|zh)_to_(de|es|ar|zh)', filename)
+    if cross_lingual_match:
+        return cross_lingual_match.group(2)  # Return the target (query) language
+
+    # EN→X pattern: en_to_{lang} - return lang
+    en_to_match = re.search(r'_en_to_(de|es|ar|zh)', filename)
+    if en_to_match:
+        return en_to_match.group(1)
 
     # Pattern: responses_codeswitching_de_20251212.jsonl
     # Pattern: responses_full_translation_zh_20251212.jsonl
@@ -237,14 +278,20 @@ def load_responses(input_path):
     return responses
 
 
-def evaluate_language_fidelity_batch(responses, condition_type, target_lang, output_dir, method="verify", num_workers=64):
+def evaluate_language_fidelity_batch(responses, condition_type, target_lang, output_dir, method="verify", num_workers=64, dataset_name=None):
     """Evaluate language fidelity for all responses using parallel GPTBatcher."""
     os.makedirs(output_dir, exist_ok=True)
 
-    # Output filename includes language
-    lang_suffix = f"_{target_lang}" if target_lang else ""
-    output_file = f"{output_dir}/language_eval{lang_suffix}.jsonl"
-    summary_file = f"{output_dir}/language_summary{lang_suffix}.json"
+    # Generate timestamp
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    # Output filename includes dataset name (if provided) or language, plus timestamp
+    if dataset_name:
+        suffix = f"_{dataset_name}_{timestamp}"
+    else:
+        suffix = f"_{target_lang}_{timestamp}" if target_lang else f"_{timestamp}"
+    output_file = f"{output_dir}/language_eval{suffix}.jsonl"
+    summary_file = f"{output_dir}/language_summary{suffix}.json"
 
     # Get expected language
     expected = get_expected_language(condition_type, target_lang)
@@ -432,12 +479,19 @@ def evaluate_language_fidelity_batch(responses, condition_type, target_lang, out
     return summary
 
 
-def evaluate_language_fidelity(responses, client, condition_type, target_lang, output_dir, method="llm"):
+def evaluate_language_fidelity(responses, client, condition_type, target_lang, output_dir, method="llm", dataset_name=None):
     """Evaluate language fidelity for all responses (sequential, deprecated)."""
     os.makedirs(output_dir, exist_ok=True)
 
-    # Output filename includes language
-    lang_suffix = f"_{target_lang}" if target_lang else ""
+    # Generate timestamp
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    # Output filename includes dataset name (if provided) or language, plus timestamp
+    if dataset_name:
+        suffix = f"_{dataset_name}_{timestamp}"
+    else:
+        suffix = f"_{target_lang}_{timestamp}" if target_lang else f"_{timestamp}"
+    lang_suffix = suffix  # Keep for compatibility
     output_file = f"{output_dir}/language_eval{lang_suffix}.jsonl"
     summary_file = f"{output_dir}/language_summary{lang_suffix}.json"
 
@@ -614,7 +668,8 @@ def main():
 
         condition_type = args.condition or infer_condition_type(input_file)
         target_lang = extract_target_language(input_file)
-        print(f"Condition: {condition_type}, Target lang: {target_lang}")
+        dataset_name = extract_dataset_name(input_file)
+        print(f"Condition: {condition_type}, Target lang: {target_lang}, Dataset: {dataset_name}")
 
         responses = load_responses(input_file)
         print(f"Loaded {len(responses)} responses")
@@ -630,7 +685,7 @@ def main():
         else:
             # Use parallel batch processing for LLM methods
             summary = evaluate_language_fidelity_batch(
-                responses, condition_type, target_lang, output_dir, args.method, args.workers
+                responses, condition_type, target_lang, output_dir, args.method, args.workers, dataset_name
             )
 
         all_summaries.append({

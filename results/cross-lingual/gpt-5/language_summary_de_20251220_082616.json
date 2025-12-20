@@ -1,0 +1,22 @@
+{
+  "condition_type": "unknown",
+  "target_language": "de",
+  "expected_response_language": "de",
+  "method": "verify",
+  "judge_model": "gpt-4o-mini",
+  "num_workers": 64,
+  "stats": {
+    "total": 182,
+    "match": 175,
+    "mismatch": 7,
+    "mixed": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "fidelity_rate": 96.15384615384616,
+  "detected_distribution": {
+    "de": 175,
+    "other": 7
+  },
+  "output_file": "results/cross-lingual/gpt-5/language_eval_de_20251220_082616.jsonl"
+}

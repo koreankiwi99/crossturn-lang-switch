@@ -1,0 +1,22 @@
+{
+  "condition_type": "codeswitching_reverse",
+  "target_language": "de",
+  "expected_response_language": "en",
+  "method": "verify",
+  "judge_model": "gpt-4o-mini",
+  "num_workers": 64,
+  "stats": {
+    "total": 182,
+    "match": 18,
+    "mismatch": 164,
+    "mixed": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "fidelity_rate": 9.89010989010989,
+  "detected_distribution": {
+    "en": 18,
+    "other": 164
+  },
+  "output_file": "results/sysprompt-ablation/claude-opus-4.5/language_eval_de_to_en_20251220_001333.jsonl"
+}

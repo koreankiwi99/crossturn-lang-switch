@@ -1,0 +1,26 @@
+{
+  "model": "gpt-5",
+  "judge_model": "gpt-4o-2024-08-06",
+  "timestamp": "20251219_233436",
+  "stats": {
+    "total": 182,
+    "passed": 94,
+    "failed": 88,
+    "error": 0,
+    "skipped": 0
+  },
+  "pass_rate": 51.64835164835166,
+  "axis_stats": {
+    "INSTRUCTION_RETENTION": {
+      "total": 69,
+      "passed": 36,
+      "pass_rate": 52.17391304347826
+    },
+    "INFERENCE_MEMORY": {
+      "total": 113,
+      "passed": 58,
+      "pass_rate": 51.32743362831859
+    }
+  },
+  "evaluated_file": "results/cross-lingual/gpt-5/evaluated_ar_to_es_20251219_233436.jsonl"
+}

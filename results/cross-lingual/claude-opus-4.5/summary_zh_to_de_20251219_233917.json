@@ -1,0 +1,26 @@
+{
+  "model": "claude-opus-4.5-openrouter",
+  "judge_model": "gpt-4o-2024-08-06",
+  "timestamp": "20251219_233917",
+  "stats": {
+    "total": 182,
+    "passed": 86,
+    "failed": 96,
+    "error": 0,
+    "skipped": 0
+  },
+  "pass_rate": 47.25274725274725,
+  "axis_stats": {
+    "INSTRUCTION_RETENTION": {
+      "total": 69,
+      "passed": 36,
+      "pass_rate": 52.17391304347826
+    },
+    "INFERENCE_MEMORY": {
+      "total": 113,
+      "passed": 50,
+      "pass_rate": 44.24778761061947
+    }
+  },
+  "evaluated_file": "results/cross-lingual/claude-opus-4.5/evaluated_zh_to_de_20251219_233917.jsonl"
+}

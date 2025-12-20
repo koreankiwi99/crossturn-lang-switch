@@ -1,0 +1,22 @@
+{
+  "condition_type": "codeswitching_reverse",
+  "target_language": "zh",
+  "expected_response_language": "en",
+  "method": "verify",
+  "judge_model": "gpt-4o-mini",
+  "num_workers": 64,
+  "stats": {
+    "total": 182,
+    "match": 170,
+    "mismatch": 12,
+    "mixed": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "fidelity_rate": 93.4065934065934,
+  "detected_distribution": {
+    "en": 170,
+    "other": 12
+  },
+  "output_file": "/Users/kyuheekim/codeswitching-apertus/results/gpt-5/language_eval_zh_to_en_20251219_232539.jsonl"
+}

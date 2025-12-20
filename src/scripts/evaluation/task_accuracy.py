@@ -27,7 +27,8 @@ JUDGE_MODEL = "gpt-4o-2024-08-06"
 
 def load_judge_prompt():
     """Load judge prompt from prompts/judge_prompt.txt."""
-    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    # Go up 4 levels: evaluation -> scripts -> src -> project_root
+    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
     prompt_path = os.path.join(base_dir, "prompts/judge_prompt.txt")
     with open(prompt_path, 'r', encoding='utf-8') as f:
         return f.read()
@@ -43,14 +44,23 @@ def load_responses(input_path):
     return responses
 
 
-def evaluate_responses_batch(responses, output_dir, num_workers=64):
+def evaluate_responses_batch(responses, output_dir, num_workers=64, input_file=None):
     """Evaluate all responses using parallel GPTBatcher."""
     os.makedirs(output_dir, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     model_name = responses[0].get("model", "unknown") if responses else "unknown"
-    output_file = f"{output_dir}/evaluated_{timestamp}.jsonl"
-    summary_file = f"{output_dir}/summary_{timestamp}.json"
+
+    # Extract dataset name from input file for unique output naming
+    if input_file:
+        basename = os.path.basename(input_file)
+        # responses_baseline_de_20251219_191016.jsonl -> baseline_de
+        dataset_name = basename.replace("responses_", "").split("_2025")[0]
+        output_file = f"{output_dir}/evaluated_{dataset_name}_{timestamp}.jsonl"
+        summary_file = f"{output_dir}/summary_{dataset_name}_{timestamp}.json"
+    else:
+        output_file = f"{output_dir}/evaluated_{timestamp}.jsonl"
+        summary_file = f"{output_dir}/summary_{timestamp}.json"
 
     judge_prompt_template = load_judge_prompt()
 
@@ -211,7 +221,7 @@ def main():
 
     output_dir = os.path.dirname(input_file)
 
-    evaluate_responses_batch(responses, output_dir, num_workers=args.workers)
+    evaluate_responses_batch(responses, output_dir, num_workers=args.workers, input_file=input_file)
 
 
 if __name__ == "__main__":

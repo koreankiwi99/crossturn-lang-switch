@@ -85,6 +85,7 @@ MODELS = {
         "model_id": "google/gemini-3-pro-preview",
         "base_url": "https://openrouter.ai/api/v1",
         "api_key_env": "OPENROUTER_API_KEY",
+        "temperature": 1.0,  # Google recommends temp=1.0 for Gemini 3 (lower temps degrade reasoning)
     },
     "llama-4-maverick": {
         "provider": "openrouter",
@@ -105,6 +106,7 @@ MODELS = {
         "model_id": "anthropic/claude-opus-4.5",
         "base_url": "https://openrouter.ai/api/v1",
         "api_key_env": "OPENROUTER_API_KEY",
+        "temperature": 0.0,
     },
     # DeepSeek via OpenRouter
     "deepseek-v3.1": {
@@ -173,15 +175,24 @@ def query_model(client, model_id, messages, provider, max_tokens=4096, temperatu
     if model_config and "temperature" in model_config:
         temperature = model_config["temperature"]
 
+    # Extract system prompt for Anthropic (it uses separate system param)
+    system_prompt = None
+    if messages and messages[0].get("role") == "system":
+        system_prompt = messages[0]["content"]
+        messages = messages[1:]  # Remove system message from messages list
+
     for attempt in range(max_retries):
         try:
             if provider == "anthropic":
-                response = client.messages.create(
-                    model=model_id,
-                    messages=messages,
-                    max_tokens=max_tokens,
-                    temperature=temperature
-                )
+                kwargs = {
+                    "model": model_id,
+                    "messages": messages,
+                    "max_tokens": max_tokens,
+                    "temperature": temperature
+                }
+                if system_prompt:
+                    kwargs["system"] = system_prompt
+                response = client.messages.create(**kwargs)
                 result = {
                     "success": True,
                     "response": response.content[0].text if response.content else "",
@@ -231,9 +242,14 @@ def query_model(client, model_id, messages, provider, max_tokens=4096, temperatu
 
 def process_single_item(args):
     """Process a single item (for parallel execution)."""
-    item, client, model_id, provider, model_config, model_name = args
+    item, client, model_id, provider, model_config, model_name, system_prompt = args
 
-    response_data = query_model(client, model_id, item['CONVERSATION'], provider, model_config=model_config)
+    # Prepend system prompt if provided
+    messages = item['CONVERSATION']
+    if system_prompt:
+        messages = [{"role": "system", "content": system_prompt}] + messages
+
+    response_data = query_model(client, model_id, messages, provider, model_config=model_config)
 
     result = {
         "question_id": item["QUESTION_ID"],
@@ -248,6 +264,10 @@ def process_single_item(args):
         **response_data
     }
 
+    # Include system prompt if used
+    if system_prompt:
+        result["system_prompt"] = system_prompt
+
     # Include code-switch info if present
     if "CODE_SWITCH" in item:
         result["code_switch"] = item["CODE_SWITCH"]
@@ -256,7 +276,8 @@ def process_single_item(args):
 
 
 def run_experiment_parallel(data, client, model_name, model_id, provider, output_dir,
-                           num_workers=32, resume_file=None, model_config=None, dataset_name=None):
+                           num_workers=32, resume_file=None, model_config=None, dataset_name=None,
+                           system_prompt=None, output_suffix=None):
     """Generate responses for all questions using parallel workers."""
     os.makedirs(output_dir, exist_ok=True)
 
@@ -277,11 +298,17 @@ def run_experiment_parallel(data, client, model_name, model_id, provider, output
     else:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         name_suffix = f"_{dataset_name}" if dataset_name else ""
-        output_file = f"{output_dir}/responses{name_suffix}_{timestamp}.jsonl"
+        # Add system prompt indicator to filename
+        prompt_suffix = "_sysprompt" if system_prompt else ""
+        # Add custom suffix if provided
+        custom_suffix = f"_{output_suffix}" if output_suffix else ""
+        output_file = f"{output_dir}/responses{name_suffix}{prompt_suffix}{custom_suffix}_{timestamp}.jsonl"
 
     print(f"\nGenerating responses with {model_name}...")
     print(f"Workers: {num_workers}")
     print(f"Output: {output_file}")
+    if system_prompt:
+        print(f"System prompt: {system_prompt[:60]}...")
     print("=" * 60)
 
     stats = {"total": len(data), "success": 0, "error": 0}
@@ -289,7 +316,7 @@ def run_experiment_parallel(data, client, model_name, model_id, provider, output
 
     # Prepare arguments for parallel processing
     task_args = [
-        (item, client, model_id, provider, model_config, model_name)
+        (item, client, model_id, provider, model_config, model_name, system_prompt)
         for item in data
     ]
 
@@ -347,6 +374,12 @@ def main():
     parser.add_argument("--workers", type=int, default=32,
                        help="Number of parallel workers (default: 32)")
 
+    parser.add_argument("--system-prompt", type=str, default=None,
+                       help="System prompt to prepend to all conversations")
+
+    parser.add_argument("--output-suffix", type=str, default=None,
+                       help="Custom suffix for output filename (e.g., 'variance_run1')")
+
     args = parser.parse_args()
 
     model_config = MODELS[args.model]
@@ -390,7 +423,8 @@ def main():
     provider = model_config.get('provider', 'openai')
     run_experiment_parallel(data, client, args.model, model_config['model_id'], provider,
                            output_dir, num_workers=args.workers, resume_file=args.resume,
-                           model_config=model_config, dataset_name=dataset_name)
+                           model_config=model_config, dataset_name=dataset_name,
+                           system_prompt=args.system_prompt, output_suffix=args.output_suffix)
 
 
 if __name__ == "__main__":

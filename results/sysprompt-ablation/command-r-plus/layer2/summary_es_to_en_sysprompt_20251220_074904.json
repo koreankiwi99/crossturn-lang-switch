@@ -1,0 +1,26 @@
+{
+  "model": "command-r-plus",
+  "judge_model": "gpt-4o-2024-08-06",
+  "timestamp": "20251220_074904",
+  "stats": {
+    "total": 182,
+    "passed": 23,
+    "failed": 159,
+    "error": 0,
+    "skipped": 0
+  },
+  "pass_rate": 12.637362637362637,
+  "axis_stats": {
+    "INSTRUCTION_RETENTION": {
+      "total": 69,
+      "passed": 10,
+      "pass_rate": 14.492753623188406
+    },
+    "INFERENCE_MEMORY": {
+      "total": 113,
+      "passed": 13,
+      "pass_rate": 11.504424778761061
+    }
+  },
+  "evaluated_file": "results/command-r-plus/evaluated_es_to_en_sysprompt_sysprompt_20251220_074904.jsonl"
+}

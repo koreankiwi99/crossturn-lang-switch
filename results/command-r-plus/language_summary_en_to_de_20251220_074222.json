@@ -1,0 +1,22 @@
+{
+  "condition_type": "codeswitching",
+  "target_language": "de",
+  "expected_response_language": "de",
+  "method": "verify",
+  "judge_model": "gpt-4o-mini",
+  "num_workers": 64,
+  "stats": {
+    "total": 182,
+    "match": 167,
+    "mismatch": 15,
+    "mixed": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "fidelity_rate": 91.75824175824175,
+  "detected_distribution": {
+    "other": 15,
+    "de": 167
+  },
+  "output_file": "results/command-r-plus/language_eval_en_to_de_20251220_074222.jsonl"
+}

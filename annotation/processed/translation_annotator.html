@@ -1,0 +1,3030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Translation Editor Pro - Created by Chengheng Li</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+        }
+
+        /* GitHub-style header */
+        .header {
+            background: #161b22;
+            border-bottom: 1px solid #30363d;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header h1 .icon { font-size: 24px; }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid #30363d;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #238636;
+            border-color: #238636;
+            color: white;
+        }
+
+        .btn-primary:hover { background: #2ea043; }
+
+        .btn-secondary {
+            background: #21262d;
+            color: #c9d1d9;
+        }
+
+        .btn-secondary:hover { background: #30363d; }
+
+        .btn-danger {
+            background: #da3633;
+            border-color: #da3633;
+            color: white;
+        }
+
+        .btn-danger:hover { background: #f85149; }
+
+        /* Main layout */
+        .main-container {
+            display: flex;
+            height: calc(100vh - 53px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 300px;
+            background: #161b22;
+            border-right: 1px solid #30363d;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-header h3 {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .entry-list {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 60px;
+        }
+
+        .entry-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid #21262d;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .entry-item:hover { background: #21262d; }
+        .entry-item.active { background: #1f6feb22; border-left: 3px solid #1f6feb; }
+
+        .entry-item .entry-title {
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .entry-item .entry-meta {
+            font-size: 11px;
+            color: #8b949e;
+        }
+
+        .entry-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .entry-status.modified { background: #d29922; }
+        .entry-status.unmodified { background: #30363d; }
+
+        /* Content area */
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-width: 0;
+        }
+
+        .content-header {
+            padding: 16px 24px;
+            background: #161b22;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .content-header h2 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+            background: #0d1117;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            font-size: 13px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            color: #8b949e;
+            transition: all 0.2s;
+        }
+
+        .tab:hover { color: #c9d1d9; }
+        .tab.active { color: #c9d1d9; border-bottom-color: #f78166; }
+
+        .tab-content {
+            flex: 1;
+            overflow: hidden;
+            padding: 20px 24px 120px 24px;
+        }
+
+        /* Message bubbles */
+        .conversation-view {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-height: calc(100vh - 300px);
+            overflow-y: auto;
+            padding-right: 8px;
+            padding-bottom: 100px;
+        }
+
+        .message-block {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            overflow: hidden;
+            scroll-margin-top: 20px;
+        }
+
+        .message-block.collapsed .message-body {
+            display: none;
+        }
+
+        .message-header {
+            padding: 12px 16px;
+            background: #21262d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+        }
+
+        .message-header:hover { background: #2d333b; }
+        .message-header.user { border-left: 3px solid #3fb950; }
+        .message-header.assistant { border-left: 3px solid #f78166; }
+
+        .message-header .collapse-icon {
+            transition: transform 0.2s;
+        }
+
+        .message-block.collapsed .message-header .collapse-icon {
+            transform: rotate(-90deg);
+        }
+
+        .message-body {
+            padding: 8px;
+        }
+
+        .sentence-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            padding: 24px;
+            transition: all 0.2s;
+            scroll-margin-top: 20px;
+            background: #161b22;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            border: 1px solid #30363d;
+        }
+
+        .sentence-row:last-child { margin-bottom: 0; }
+        .sentence-row:hover { background: #1c2128; cursor: pointer; border-color: #484f58; }
+        .sentence-row.modified { background: #3d2e00; border-left: 4px solid #d29922; border-color: #d29922; }
+        .sentence-row.selected { 
+            background: #0d419d33; 
+            border-left: 4px solid #1f6feb;
+            border-color: #1f6feb;
+            box-shadow: 0 0 20px rgba(31, 111, 235, 0.2);
+        }
+        .sentence-row.editing {
+            background: #5c2d0033;
+            border-left: 4px solid #f0883e;
+            border-color: #f0883e;
+            box-shadow: 0 0 20px rgba(240, 136, 62, 0.2);
+        }
+        .sentence-row .sentence-number {
+            position: absolute;
+            left: -30px;
+            top: 0;
+            font-size: 11px;
+            color: #484f58;
+            font-weight: 600;
+        }
+        
+        .sentence-row .nav-indicator {
+            position: absolute;
+            left: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 30px;
+            background: #1f6feb;
+            border-radius: 2px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .sentence-row.selected .nav-indicator {
+            opacity: 1;
+        }
+        
+        .edit-hint {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #1f6feb;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+        
+        .sentence-row.selected .edit-hint {
+            opacity: 1;
+        }
+
+        .sentence-col {
+            position: relative;
+        }
+
+        .sentence-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #8b949e;
+            margin-bottom: 10px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            padding: 6px 12px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .sentence-text {
+            font-size: 14px;
+            line-height: 1.7;
+            color: #c9d1d9;
+        }
+
+        .sentence-text.original,
+        .sentence-text.translation { 
+            color: #c9d1d9; 
+            background: #21262d;
+            padding: 16px 18px;
+            border-radius: 8px;
+            font-size: 15px;
+            line-height: 1.8;
+            height: 300px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #30363d;
+        }
+        
+        .sentence-text.translation {
+            background: #0d1117;
+        }
+        
+        .sentence-text.translation.modified {
+            border-color: #d29922;
+            background: #1a1500;
+        }
+        
+        .sentence-text p {
+            margin-bottom: 12px;
+        }
+        
+        .sentence-text p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .sentence-text li {
+            margin-left: 20px;
+            margin-bottom: 6px;
+        }
+
+        .sentence-input {
+            width: 100%;
+            background: #0d1117;
+            border: 2px solid #1f6feb;
+            border-radius: 8px;
+            padding: 16px 18px;
+            font-size: 15px;
+            line-height: 1.8;
+            color: #c9d1d9;
+            resize: none;
+            min-height: 150px;
+            max-height: 300px;
+            height: 300px;
+            font-family: inherit;
+            overflow-y: auto;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 0 20px rgba(31, 111, 235, 0.3);
+        }
+
+        .sentence-input:focus {
+            outline: none;
+            border-color: #1f6feb;
+            box-shadow: 0 0 0 3px #1f6feb33;
+        }
+
+        .sentence-input.modified {
+            border-color: #d29922;
+            background: #d2992208;
+        }
+
+        .sentence-input:focus.modified {
+            border-color: #d29922;
+            box-shadow: 0 0 0 3px #d2992233;
+        }
+
+        .sentence-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .sentence-actions .btn {
+            padding: 4px 10px;
+            font-size: 11px;
+        }
+
+        /* Version history panel */
+        .history-panel {
+            width: 350px;
+            background: #161b22;
+            border-left: 1px solid #30363d;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .history-panel.hidden { display: none; }
+
+        .history-header {
+            padding: 16px;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-header h3 {
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .history-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .commit-item {
+            padding: 14px 16px;
+            border-bottom: 1px solid #21262d;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .commit-item:hover { background: #21262d; }
+
+        .commit-hash {
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 12px;
+            color: #1f6feb;
+            margin-bottom: 4px;
+        }
+
+        .commit-message {
+            font-size: 13px;
+            margin-bottom: 6px;
+            color: #c9d1d9;
+        }
+
+        .commit-meta {
+            font-size: 11px;
+            color: #8b949e;
+        }
+
+        .commit-stats {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+            font-size: 11px;
+        }
+
+        .commit-stats .additions { color: #3fb950; }
+        .commit-stats .deletions { color: #f85149; }
+
+        /* Diff view */
+        .diff-view {
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 12px;
+            background: #0d1117;
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 16px 0;
+        }
+
+        .diff-header {
+            padding: 10px 16px;
+            background: #161b22;
+            border-bottom: 1px solid #30363d;
+            font-weight: 600;
+        }
+
+        .diff-line {
+            padding: 2px 16px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .diff-line.addition {
+            background: #2ea04326;
+            color: #3fb950;
+        }
+
+        .diff-line.deletion {
+            background: #f8514926;
+            color: #f85149;
+        }
+
+        .diff-line.context {
+            color: #8b949e;
+        }
+
+        /* Stats bar */
+        .stats-bar {
+            display: flex;
+            gap: 24px;
+            padding: 12px 24px;
+            background: #161b22;
+            border-bottom: 1px solid #30363d;
+            font-size: 13px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: #c9d1d9;
+        }
+
+        .stat-label { color: #8b949e; }
+
+        /* Empty state */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .empty-state h2 {
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+
+        .empty-state p {
+            color: #8b949e;
+            margin-bottom: 24px;
+        }
+
+        .drop-zone {
+            border: 2px dashed #30363d;
+            border-radius: 12px;
+            padding: 60px 80px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: #1f6feb;
+            background: #1f6feb11;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.hidden { display: none; }
+
+        .modal {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            width: 500px;
+            max-width: 90%;
+        }
+
+        .modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #30363d;
+            font-weight: 600;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-footer {
+            padding: 16px 20px;
+            border-top: 1px solid #30363d;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 10px 12px;
+            font-size: 14px;
+            color: #c9d1d9;
+            font-family: inherit;
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #1f6feb;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0d1117; }
+        ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #484f58; }
+
+        #fileInput { display: none; }
+
+        .change-indicator {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .change-indicator.modified { background: #d2992233; color: #d29922; }
+        .change-indicator.original { background: #30363d; color: #8b949e; }
+
+        .keyboard-hint {
+            font-size: 11px;
+            color: #8b949e;
+            padding: 8px 16px;
+            background: #21262d;
+            border-top: 1px solid #30363d;
+        }
+
+        .keyboard-hint kbd {
+            background: #30363d;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 10px;
+        }
+
+        /* Floating toolbar - moved to not block content */
+        .floating-toolbar {
+            position: fixed;
+            bottom: 0;
+            left: 300px;
+            right: 0;
+            background: #161b22;
+            border-top: 1px solid #30363d;
+            padding: 10px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            z-index: 100;
+        }
+
+        .floating-toolbar.hidden { display: none; }
+
+        .floating-toolbar .btn {
+            padding: 8px 14px;
+            font-size: 12px;
+        }
+
+        .floating-toolbar .divider {
+            width: 1px;
+            height: 24px;
+            background: #30363d;
+            margin: 0 4px;
+        }
+
+        .floating-toolbar .progress-text {
+            font-size: 13px;
+            color: #c9d1d9;
+            padding: 0 12px;
+            font-weight: 600;
+        }
+
+        /* History panel inline */
+        .sentence-history {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            margin-top: 12px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .sentence-history.visible {
+            display: block;
+            animation: slideDown 0.2s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; max-height: 0; }
+            to { opacity: 1; max-height: 500px; }
+        }
+
+        .sentence-history-header {
+            background: #21262d;
+            padding: 10px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .sentence-history-header .close-history {
+            background: none;
+            border: none;
+            color: #8b949e;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0 4px;
+        }
+
+        .sentence-history-header .close-history:hover {
+            color: #c9d1d9;
+        }
+
+        .sentence-history-content {
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            padding: 12px 14px;
+            border-bottom: 1px solid #21262d;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 11px;
+        }
+
+        .history-item-header .version {
+            background: #1f6feb;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .history-item-header .timestamp {
+            color: #8b949e;
+        }
+
+        .history-item-diff {
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .history-item-diff .from {
+            background: #f8514922;
+            color: #f85149;
+            padding: 6px 10px;
+            border-radius: 4px;
+            margin-bottom: 6px;
+            border-left: 3px solid #f85149;
+        }
+
+        .history-item-diff .to {
+            background: #2ea04322;
+            color: #3fb950;
+            padding: 6px 10px;
+            border-radius: 4px;
+            border-left: 3px solid #3fb950;
+        }
+
+        .history-item-diff .label {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            opacity: 0.7;
+        }
+
+        .no-history {
+            padding: 20px;
+            text-align: center;
+            color: #8b949e;
+            font-size: 13px;
+        }
+
+        /* History Modal Overlay */
+        .history-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 40px;
+        }
+
+        .history-modal-overlay.hidden {
+            display: none;
+        }
+
+        .history-modal {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 16px;
+            width: 95%;
+            max-width: 1400px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .history-modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #21262d;
+        }
+
+        .history-modal-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .history-modal-close {
+            background: none;
+            border: none;
+            color: #8b949e;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .history-modal-close:hover {
+            background: #30363d;
+            color: #c9d1d9;
+        }
+
+        .history-modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .history-version {
+            margin-bottom: 24px;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .history-version:last-child {
+            margin-bottom: 0;
+        }
+
+        .history-version-header {
+            padding: 12px 16px;
+            background: #21262d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .history-version-badge {
+            background: #1f6feb;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .history-version-time {
+            color: #8b949e;
+            font-size: 13px;
+        }
+
+        .history-diff-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+        }
+
+        .history-diff-side {
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 400px;
+        }
+
+        .history-diff-side.before {
+            background: #1a0000;
+            border-right: 1px solid #30363d;
+        }
+
+        .history-diff-side.after {
+            background: #001a00;
+        }
+
+        .history-diff-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 12px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .history-diff-label.before {
+            background: #f8514933;
+            color: #f85149;
+        }
+
+        .history-diff-label.after {
+            background: #3fb95033;
+            color: #3fb950;
+        }
+
+        .history-diff-content {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #c9d1d9;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .history-diff-content.before {
+            color: #ffa198;
+        }
+
+        .history-diff-content.after {
+            color: #7ee787;
+        }
+
+        .history-no-changes {
+            text-align: center;
+            padding: 60px 40px;
+            color: #8b949e;
+        }
+
+        .history-no-changes h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: #c9d1d9;
+        }
+
+        /* Diff View Container */
+        .diff-view-container {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .diff-view {
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 13px;
+        }
+
+        .diff-header {
+            padding: 14px 18px;
+            background: #21262d;
+            border-bottom: 1px solid #30363d;
+            font-weight: 600;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .diff-content {
+            height: 500px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 0;
+            padding-bottom: 80px;
+        }
+
+        .diff-line {
+            padding: 4px 18px;
+            white-space: pre-wrap;
+            word-break: break-word;
+            border-bottom: 1px solid #21262d;
+        }
+
+        .diff-line.addition {
+            background: #2ea04326;
+            color: #7ee787;
+        }
+
+        .diff-line.deletion {
+            background: #f8514926;
+            color: #ffa198;
+        }
+
+        .diff-line.context {
+            color: #8b949e;
+        }
+
+        /* Sync scroll indicator */
+        .scroll-sync-indicator {
+            position: fixed;
+            right: 20px;
+            bottom: 90px;
+            background: #1f6feb;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .scroll-sync-indicator.visible { opacity: 1; }
+
+        /* Toast notifications */
+        .toast {
+            position: fixed;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #238636;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+            z-index: 1001;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .toast.visible {
+            opacity: 1;
+        }
+
+        .toast.error { background: #da3633; }
+
+        /* Progress bar */
+        .progress-bar-container {
+            position: fixed;
+            top: 53px;
+            left: 300px;
+            right: 0;
+            height: 3px;
+            background: #21262d;
+            z-index: 99;
+        }
+
+        .progress-bar-container.hidden { display: none; }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #238636, #3fb950);
+            transition: width 0.3s;
+        }
+
+        /* Quick jump menu */
+        .quick-jump {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            margin-top: 4px;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            z-index: 101;
+        }
+
+        .quick-jump.visible { display: block; }
+
+        .quick-jump-item {
+            padding: 10px 14px;
+            cursor: pointer;
+            font-size: 13px;
+            border-bottom: 1px solid #21262d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .quick-jump-item:hover { background: #21262d; }
+        .quick-jump-item:last-child { border-bottom: none; }
+
+        /* Sentence focus mode */
+        .sentence-row.focused {
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 0 0 2px #1f6feb;
+            border-radius: 8px;
+        }
+
+        /* Auto-save indicator */
+        .autosave-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: #8b949e;
+        }
+
+        .autosave-indicator .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #3fb950;
+        }
+
+        .autosave-indicator .dot.saving {
+            background: #d29922;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Score annotation styles */
+        .score-field {
+            margin-bottom: 20px;
+        }
+
+        .score-field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #c9d1d9;
+        }
+
+        .score-buttons {
+            display: flex;
+            gap: 6px;
+        }
+
+        .score-btn {
+            flex: 1;
+            padding: 10px 8px;
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #8b949e;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .score-btn:hover {
+            background: #30363d;
+            color: #c9d1d9;
+        }
+
+        .score-btn.active {
+            background: #238636;
+            border-color: #238636;
+            color: white;
+        }
+
+        .score-hint {
+            font-size: 11px;
+            color: #8b949e;
+            margin-top: 6px;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>
+            <span class="icon">📝</span>
+            Translation Annotator
+            <span style="font-size: 11px; color: #8b949e; font-weight: 400; margin-left: 8px;">Created by Chengheng Li</span>
+        </h1>
+        <div class="header-actions">
+            <input type="file" id="fileInput" accept=".csv">
+            <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">
+                📁 Open CSV
+            </button>
+            <button class="btn btn-primary" id="commitBtn" onclick="openCommitModal()" style="display:none;">
+                ✓ Commit Changes
+            </button>
+            <button class="btn btn-secondary" id="exportBtn" onclick="exportAll()" style="display:none;">
+                📦 Export All
+            </button>
+            <input type="file" id="historyFileInput" accept=".json" style="display:none;">
+            <button class="btn btn-secondary" id="importHistoryBtn" onclick="document.getElementById('historyFileInput').click()" style="display:none;">
+                📥 Import History
+            </button>
+            <button class="btn btn-secondary" id="historyToggle" onclick="toggleHistory()" style="display:none;">
+                🕐 History
+            </button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Sidebar: Entry list -->
+        <div class="sidebar" id="sidebar" style="display:none;">
+            <div class="sidebar-header">
+                <h3>📄 Entries</h3>
+                <span id="entryCount" style="font-size: 12px; color: #8b949e;">0 entries</span>
+            </div>
+            <div class="entry-list" id="entryList"></div>
+            <div class="keyboard-hint">
+                <kbd>↑</kbd><kbd>↓</kbd> Navigate sentences &nbsp;
+                <kbd>Enter</kbd> Edit &nbsp;
+                <kbd>Esc</kbd> Exit edit
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="content-area">
+            <div id="emptyState" class="empty-state" style="overflow-y: auto; max-height: calc(100vh - 60px); padding: 20px;">
+                <div style="max-width: 800px; margin: 0 auto;">
+                    <!-- Spacer for header -->
+                    <div style="height: 500px;"></div>
+                    
+                    <!-- Warning Box -->
+                    <div style="margin-bottom: 30px; background: linear-gradient(135deg, #5c1a1a 0%, #3d1515 100%); border: 2px solid #f85149; border-radius: 12px; padding: 20px;">
+                        <div style="display: flex; align-items: flex-start; gap: 16px;">
+                            <div style="font-size: 32px;">⚠️</div>
+                            <div>
+                                <h2 style="margin-bottom: 10px; font-size: 18px; color: #f85149; font-weight: 700;">IMPORTANT: Save Your Work!</h2>
+                                <p style="font-size: 14px; color: #ffa198; line-height: 1.6; margin-bottom: 8px;">
+                                    <strong>DO NOT refresh (F5) or close the browser</strong> before committing your changes!
+                                </p>
+                                <p style="font-size: 13px; color: #ffa198; line-height: 1.6;">
+                                    All work done between commits will be <strong>permanently lost</strong> if you refresh or close the page. 
+                                    Always click <strong>"✓ Commit Changes"</strong> to save your progress. A history file will be auto-downloaded that you can reload later.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Instructions Section -->
+                    <div style="margin-bottom: 30px; text-align: left; background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 24px;">
+                        <h2 style="margin-bottom: 16px; font-size: 18px; color: #c9d1d9;">📖 How to Use</h2>
+                        
+                        <div style="margin-bottom: 16px;">
+                            <h3 style="font-size: 14px; color: #58a6ff; margin-bottom: 8px;">1. Upload Your CSV</h3>
+                            <p style="font-size: 13px; color: #8b949e; line-height: 1.6;">Drop or select a CSV file with <code style="background:#21262d;padding:2px 6px;border-radius:4px;">original_conversation</code> and <code style="background:#21262d;padding:2px 6px;border-radius:4px;">translated_conversation</code> columns.</p>
+                        </div>
+                        
+                        <div style="margin-bottom: 16px;">
+                            <h3 style="font-size: 14px; color: #58a6ff; margin-bottom: 8px;">2. Edit Translations</h3>
+                            <p style="font-size: 13px; color: #8b949e; line-height: 1.6;">Use the <strong>Turn Editor</strong> to edit individual messages. Navigate with <kbd style="background:#21262d;padding:2px 6px;border-radius:4px;font-size:11px;">↑</kbd><kbd style="background:#21262d;padding:2px 6px;border-radius:4px;font-size:11px;">↓</kbd> keys, press <kbd style="background:#21262d;padding:2px 6px;border-radius:4px;font-size:11px;">Enter</kbd> to edit.</p>
+                        </div>
+                        
+                        <div style="margin-bottom: 16px;">
+                            <h3 style="font-size: 14px; color: #58a6ff; margin-bottom: 8px;">3. Annotate Quality Scores</h3>
+                            <p style="font-size: 13px; color: #8b949e; line-height: 1.6;">Go to the <strong>⭐ Annotate</strong> tab to rate semantic accuracy, completeness, constraints, and overall quality (1-5).</p>
+                        </div>
+                        
+                        <div style="margin-bottom: 16px;">
+                            <h3 style="font-size: 14px; color: #58a6ff; margin-bottom: 8px;">4. Commit & Export</h3>
+                            <p style="font-size: 13px; color: #8b949e; line-height: 1.6;">Click <strong>✓ Commit Changes</strong> to save your work. A history file is auto-downloaded. Export the corrected CSV with scores via <strong>📦 Export All</strong>.</p>
+                        </div>
+                        
+                        <div>
+                            <h3 style="font-size: 14px; color: #58a6ff; margin-bottom: 8px;">5. Resume Later</h3>
+                            <p style="font-size: 13px; color: #8b949e; line-height: 1.6;">When you reload the CSV, you'll be prompted to load your commit history file to restore all changes and scores.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Keyboard Shortcuts Section -->
+                    <div style="margin-bottom: 30px; text-align: left; background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 24px;">
+                        <h2 style="margin-bottom: 16px; font-size: 18px; color: #c9d1d9;">⌨️ Keyboard Shortcuts</h2>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <kbd style="background:#21262d;padding:6px 10px;border-radius:4px;font-size:12px;min-width:40px;text-align:center;">↑</kbd>
+                                <span style="font-size: 13px; color: #8b949e;">Previous turn</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <kbd style="background:#21262d;padding:6px 10px;border-radius:4px;font-size:12px;min-width:40px;text-align:center;">↓</kbd>
+                                <span style="font-size: 13px; color: #8b949e;">Next turn</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <kbd style="background:#21262d;padding:6px 10px;border-radius:4px;font-size:12px;min-width:40px;text-align:center;">←</kbd>
+                                <span style="font-size: 13px; color: #8b949e;">Previous entry</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <kbd style="background:#21262d;padding:6px 10px;border-radius:4px;font-size:12px;min-width:40px;text-align:center;">→</kbd>
+                                <span style="font-size: 13px; color: #8b949e;">Next entry</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <kbd style="background:#21262d;padding:6px 10px;border-radius:4px;font-size:12px;min-width:40px;text-align:center;">Enter</kbd>
+                                <span style="font-size: 13px; color: #8b949e;">Edit turn</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <kbd style="background:#21262d;padding:6px 10px;border-radius:4px;font-size:12px;min-width:40px;text-align:center;">Esc</kbd>
+                                <span style="font-size: 13px; color: #8b949e;">Finish edit</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Drop Zone -->
+                    <div class="drop-zone" id="dropZone" style="margin-bottom: 20px;">
+                        <h2>📄 Drop CSV file here</h2>
+                        <p>or click to browse</p>
+                    </div>
+                    <p style="text-align: center; color: #8b949e;">Supports CSV with original_conversation and translated_conversation columns</p>
+                </div>
+            </div>
+
+            <div id="mainContent" style="display:none;">
+                <div class="stats-bar">
+                    <div class="stat-item">
+                        <span class="stat-value" id="totalEntriesStat">0</span>
+                        <span class="stat-label">entries</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="modifiedEntriesStat">0</span>
+                        <span class="stat-label">modified</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="totalChangesStat">0</span>
+                        <span class="stat-label">changes</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="commitsStat">0</span>
+                        <span class="stat-label">commits</span>
+                    </div>
+                </div>
+
+                <div class="content-header">
+                    <h2 id="currentEntryTitle">Entry #1</h2>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span id="entryStatus" class="change-indicator original">Original</span>
+                        <button class="btn btn-secondary" onclick="revertEntry()">↩️ Revert</button>
+                    </div>
+                </div>
+
+                <div class="tabs">
+                    <div class="tab active" data-tab="sentences" onclick="switchTab('sentences')">
+                        � Turn Editor
+                    </div>
+                    <div class="tab" data-tab="diff" onclick="switchTab('diff')">
+                        📊 Diff View
+                    </div>
+                    <div class="tab" data-tab="full" onclick="switchTab('full')">
+                        📄 Full Text
+                    </div>
+                    <div class="tab" data-tab="annotate" onclick="switchTab('annotate')">
+                        ⭐ Annotate
+                    </div>
+                </div>
+
+                <div class="tab-content" id="tabContent">
+                    <!-- Content loaded dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- History panel -->
+        <div class="history-panel hidden" id="historyPanel">
+            <div class="history-header">
+                <h3>🕐 Version History</h3>
+                <button class="btn btn-secondary" onclick="toggleHistory()" style="padding: 4px 8px;">✕</button>
+            </div>
+            <div class="history-list" id="historyList">
+                <p style="padding: 20px; color: #8b949e; text-align: center;">No commits yet</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Commit Modal -->
+    <div class="modal-overlay hidden" id="commitModal">
+        <div class="modal">
+            <div class="modal-header">✓ Commit Changes</div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Commit Message</label>
+                    <input type="text" id="commitMessage" placeholder="Describe your changes...">
+                </div>
+                <div class="form-group">
+                    <label>Details (optional)</label>
+                    <textarea id="commitDetails" rows="3" placeholder="Additional notes about this commit..."></textarea>
+                </div>
+                <div id="commitPreview" style="margin-top: 16px;"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeCommitModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="commitChanges()">Commit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div class="modal-overlay hidden" id="exportModal">
+        <div class="modal">
+            <div class="modal-header">📦 Export Options</div>
+            <div class="modal-body">
+                <p style="margin-bottom: 16px;">Choose what to export:</p>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <button class="btn btn-primary" onclick="downloadCorrectedCSV()" style="width: 100%;">
+                        📄 Corrected CSV (Final Version)
+                    </button>
+                    <button class="btn btn-secondary" onclick="downloadChangesJSON()" style="width: 100%;">
+                        📊 Changes Log (JSON)
+                    </button>
+                    <button class="btn btn-secondary" onclick="downloadCommitHistory()" style="width: 100%;">
+                        🕐 Full Commit History
+                    </button>
+                    <button class="btn btn-secondary" onclick="downloadDetailedReport()" style="width: 100%;">
+                        📋 Detailed Report (TXT)
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeExportModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Modal -->
+    <div class="history-modal-overlay hidden" id="historyModalOverlay" onclick="closeHistoryModal(event)">
+        <div class="history-modal" onclick="event.stopPropagation()">
+            <div class="history-modal-header">
+                <h2>📜 Edit History - <span id="historyModalTitle">Turn 1</span></h2>
+                <button class="history-modal-close" onclick="closeHistoryModal()">&times;</button>
+            </div>
+            <div class="history-modal-body" id="historyModalBody">
+                <!-- History content loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Toolbar -->
+    <div class="floating-toolbar hidden" id="floatingToolbar">
+        <button class="btn btn-secondary" onclick="navigateSentence(-1)" title="Previous turn (↑)">⬆️ Prev</button>
+        <button class="btn btn-secondary" onclick="navigateSentence(1)" title="Next turn (↓)">⬇️ Next</button>
+        <div class="divider"></div>
+        <span class="progress-text" id="progressText">Turn 0 / 0</span>
+        <div class="divider"></div>
+        <button class="btn btn-primary" onclick="enterEditMode()" title="Edit selected (Enter)">✏️ Edit Turn</button>
+        <div class="divider"></div>
+        <button class="btn btn-secondary" onclick="jumpToPrevModified()" title="Previous modified entry (P)">⏮️</button>
+        <button class="btn btn-secondary" onclick="jumpToNextModified()" title="Next modified entry (N)">⏭️</button>
+        <div class="divider"></div>
+        <div class="autosave-indicator">
+            <span class="dot" id="autosaveDot"></span>
+            <span id="autosaveText">Saved</span>
+        </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar-container hidden" id="progressBarContainer">
+        <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ============ STATE ============
+        let data = [];
+        let originalData = [];
+        let currentIndex = 0;
+        let currentTab = 'sentences';
+        let currentSentenceIndex = 0;
+        let totalSentences = 0;
+        
+        // Version control state
+        let changes = {}; // { entryIndex: { sentenceIndex: { original, current, history: [] } } }
+        let commits = []; // [{ hash, message, details, timestamp, changes: {...}, stats }]
+        let uncommittedChanges = {}; // Same structure as changes, but not yet committed
+        
+        // Auto-save timer
+        let autoSaveTimer = null;
+        
+        // Current file name (for auto-saving commits)
+        let currentFileName = '';
+
+        // ============ FILE HANDLING ============
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            if (e.target.files[0]) processFile(e.target.files[0]);
+        });
+
+        document.getElementById('historyFileInput').addEventListener('change', (e) => {
+            if (e.target.files[0]) importHistoryFile(e.target.files[0]);
+        });
+
+        const dropZone = document.getElementById('dropZone');
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files[0]) processFile(e.dataTransfer.files[0]);
+        });
+        dropZone.addEventListener('click', () => document.getElementById('fileInput').click());
+
+        function processFile(file) {
+            // Store the filename without extension for commit history naming
+            currentFileName = file.name.replace(/\.csv$/i, '');
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                parseCSV(e.target.result);
+                // After parsing CSV, try to auto-load matching commit history
+                tryAutoLoadCommitHistory();
+            };
+            reader.readAsText(file);
+        }
+
+        function parseCSV(text) {
+            const lines = text.split('\n');
+            const headers = parseCSVLine(lines[0]);
+            
+            data = [];
+            let currentRow = [];
+            let inQuotes = false;
+            let currentField = '';
+            
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i];
+                for (let j = 0; j < line.length; j++) {
+                    const char = line[j];
+                    if (char === '"') {
+                        if (inQuotes && line[j + 1] === '"') { currentField += '"'; j++; }
+                        else inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        currentRow.push(currentField);
+                        currentField = '';
+                    } else {
+                        currentField += char;
+                    }
+                }
+                
+                if (inQuotes) {
+                    currentField += '\n';
+                } else {
+                    currentRow.push(currentField);
+                    currentField = '';
+                    if (currentRow.length >= headers.length) {
+                        const obj = {};
+                        headers.forEach((h, idx) => obj[h.trim()] = currentRow[idx] || '');
+                        if (obj.original_conversation || obj.translated_conversation) data.push(obj);
+                    }
+                    currentRow = [];
+                }
+            }
+
+            originalData = JSON.parse(JSON.stringify(data));
+            changes = {};
+            uncommittedChanges = {};
+            commits = [];
+            
+            initializeUI();
+        }
+
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                if (char === '"') inQuotes = !inQuotes;
+                else if (char === ',' && !inQuotes) { result.push(current); current = ''; }
+                else current += char;
+            }
+            result.push(current);
+            return result;
+        }
+
+        // ============ UI INITIALIZATION ============
+        function initializeUI() {
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'flex';
+            document.getElementById('mainContent').style.flexDirection = 'column';
+            document.getElementById('mainContent').style.flex = '1';
+            document.getElementById('sidebar').style.display = 'flex';
+            document.getElementById('commitBtn').style.display = 'inline-block';
+            document.getElementById('exportBtn').style.display = 'inline-block';
+            document.getElementById('importHistoryBtn').style.display = 'inline-block';
+            document.getElementById('historyToggle').style.display = 'inline-block';
+            document.getElementById('floatingToolbar').classList.remove('hidden');
+            document.getElementById('progressBarContainer').classList.remove('hidden');
+            
+            renderEntryList();
+            selectEntry(0);
+            updateStats();
+            updateProgress();
+            showToast('CSV loaded successfully!', 'success');
+        }
+
+        function renderEntryList() {
+            const list = document.getElementById('entryList');
+            list.innerHTML = data.map((entry, idx) => {
+                const isModified = hasUncommittedChanges(idx) || hasCommittedChanges(idx);
+                const turns = entry.num_turns || '?';
+                return `
+                    <div class="entry-item ${idx === currentIndex ? 'active' : ''}" onclick="selectEntry(${idx})">
+                        <div class="entry-title">
+                            <span class="entry-status ${isModified ? 'modified' : 'unmodified'}"></span>
+                            Entry #${idx + 1}
+                        </div>
+                        <div class="entry-meta">${turns} turns · ${(entry.translated_conversation || '').length} chars</div>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('entryCount').textContent = `${data.length} entries`;
+        }
+
+        function selectEntry(idx) {
+            currentIndex = idx;
+            renderEntryList();
+            renderContent();
+            updateEntryStatus();
+        }
+
+        function updateEntryStatus() {
+            const status = document.getElementById('entryStatus');
+            if (hasUncommittedChanges(currentIndex)) {
+                status.textContent = 'Uncommitted';
+                status.className = 'change-indicator modified';
+            } else if (hasCommittedChanges(currentIndex)) {
+                status.textContent = 'Modified';
+                status.className = 'change-indicator modified';
+            } else {
+                status.textContent = 'Original';
+                status.className = 'change-indicator original';
+            }
+            document.getElementById('currentEntryTitle').textContent = `Entry #${currentIndex + 1} - ${data[currentIndex].question_id || 'Unknown ID'}`;
+        }
+
+        // ============ CONTENT RENDERING ============
+        function renderContent() {
+            const content = document.getElementById('tabContent');
+            
+            if (currentTab === 'sentences') {
+                content.innerHTML = renderSentenceEditor();
+            } else if (currentTab === 'diff') {
+                content.innerHTML = renderDiffView();
+            } else if (currentTab === 'full') {
+                content.innerHTML = renderFullText();
+            } else if (currentTab === 'annotate') {
+                content.innerHTML = renderAnnotateView();
+            }
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.tab[data-tab="${tab}"]`).classList.add('active');
+            renderContent();
+        }
+
+        function renderSentenceEditor() {
+            const entry = data[currentIndex];
+            const originalEntry = originalData[currentIndex];
+            
+            // Parse by conversation turns (USER/ASSISTANT messages)
+            const originalMessages = parseMessages(originalEntry.original_conversation || '');
+            const translatedMessages = parseMessages(entry.translated_conversation || '');
+            const originalTranslatedMessages = parseMessages(originalEntry.translated_conversation || '');
+            
+            let html = '<div class="conversation-view">';
+            
+            translatedMessages.forEach((msg, msgIdx) => {
+                const origMsg = originalMessages[msgIdx] || { role: msg.role, content: '' };
+                const origTransMsg = originalTranslatedMessages[msgIdx] || { role: msg.role, content: '' };
+                const isModified = msg.content !== origTransMsg.content;
+                const isCurrentlyEditing = isEditingMode && selectedMsgIdx === msgIdx;
+                
+                html += `
+                    <div class="sentence-row ${isModified ? 'modified' : ''} ${isCurrentlyEditing ? 'editing' : ''}" data-msg="${msgIdx}" data-sent="0" onclick="selectSentenceRow(${msgIdx}, 0)">
+                        <div class="sentence-col" style="position: relative;">
+                            <div class="nav-indicator"></div>
+                            <div class="sentence-label">
+                                ${msg.role === 'user' ? '👤 USER' : '🤖 ASSISTANT'} · Turn ${msgIdx + 1} · Original
+                            </div>
+                            <div class="sentence-text original">${formatAsMarkdown(origMsg.content)}</div>
+                        </div>
+                        <div class="sentence-col" style="position: relative;">
+                            <div class="edit-hint">Press ENTER to edit</div>
+                            <div class="sentence-label">
+                                ${msg.role === 'user' ? '👤 USER' : '🤖 ASSISTANT'} · Translation 
+                                ${isModified ? '<span style="color:#d29922;margin-left:8px;">● Modified</span>' : ''}
+                            </div>
+                            <div class="sentence-text translation ${isModified ? 'modified' : ''}" id="display-${msgIdx}" ${isCurrentlyEditing ? 'style="display:none;"' : ''}>
+                                ${formatAsMarkdown(msg.content)}
+                            </div>
+                            <textarea class="sentence-input ${isModified ? 'modified' : ''}" 
+                                id="input-${msgIdx}"
+                                data-msg="${msgIdx}" 
+                                data-sent="0"
+                                onchange="handleTurnChange(${msgIdx}, this.value)"
+                                oninput="triggerAutoSave();"
+                                onclick="event.stopPropagation();"
+                                style="${isCurrentlyEditing ? '' : 'display:none;'}"
+                            >${escapeHtml(msg.content)}</textarea>
+                            <div class="sentence-actions">
+                                ${isModified ? `<button class="btn btn-secondary" onclick="event.stopPropagation(); revertTurn(${msgIdx})">↩️ Revert</button>` : ''}
+                                <button class="btn btn-secondary" onclick="event.stopPropagation(); toggleTurnHistory(${msgIdx})"> History</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            return html;
+        }
+        
+        function formatAsMarkdown(text) {
+            if (!text) return '<em style="color:#484f58">No content</em>';
+            
+            let formatted = escapeHtml(text);
+            
+            // Convert line breaks
+            formatted = formatted.replace(/\n\n/g, '</p><p>');
+            formatted = formatted.replace(/\n/g, '<br>');
+            
+            // Convert lists (lines starting with - or numbers)
+            formatted = formatted.replace(/^- (.+)$/gm, '<li>$1</li>');
+            formatted = formatted.replace(/^(\d+)\. (.+)$/gm, '<li><strong>$1.</strong> $2</li>');
+            
+            // Wrap in paragraph
+            formatted = '<p>' + formatted + '</p>';
+            
+            // Clean up empty paragraphs
+            formatted = formatted.replace(/<p><\/p>/g, '');
+            
+            return formatted;
+        }
+
+        function renderDiffView() {
+            const current = data[currentIndex].translated_conversation || '';
+            const original = originalData[currentIndex].translated_conversation || '';
+            
+            if (current === original) {
+                return '<div style="text-align:center;padding:40px;color:#8b949e;">No changes to display</div>';
+            }
+            
+            const diff = computeDiff(original, current);
+            
+            let html = `
+                <div class="diff-view-container">
+                    <div class="diff-view">
+                        <div class="diff-header">
+                            Changes in Entry #${currentIndex + 1}
+                        </div>
+                        <div class="diff-content">
+                            ${diff}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            return html;
+        }
+
+        function renderFullText() {
+            const entry = data[currentIndex];
+            
+            return `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <h3 style="margin-bottom: 12px; font-size: 14px;">Original (English)</h3>
+                        <div style="background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 16px; white-space: pre-wrap; font-size: 13px; line-height: 1.8; max-height: 60vh; overflow-y: auto;">
+                            ${escapeHtml(entry.original_conversation || '')}
+                        </div>
+                    </div>
+                    <div>
+                        <h3 style="margin-bottom: 12px; font-size: 14px;">Translation (Editable)</h3>
+                        <textarea style="width: 100%; background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 16px; font-size: 13px; line-height: 1.8; color: #c9d1d9; min-height: 60vh; resize: vertical; font-family: inherit;"
+                            onchange="handleFullTextChange(this.value)"
+                        >${escapeHtml(entry.translated_conversation || '')}</textarea>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAnnotateView() {
+            const entry = data[currentIndex];
+            const scores = entry.scores || {};
+            
+            const current = entry.translated_conversation || '';
+            const original = originalData[currentIndex].translated_conversation || '';
+            const hasChanges = current !== original;
+            const diff = hasChanges ? computeDiff(original, current) : '<div style="text-align:center;padding:40px;color:#8b949e;">No changes to display</div>';
+            
+            return `
+                <div style="display: grid; grid-template-columns: 350px 1fr; gap: 24px; height: calc(100vh - 350px);">
+                    <!-- Left: Annotation Form -->
+                    <div style="background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 20px; overflow-y: auto;">
+                        <h3 style="margin-bottom: 20px; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+                            ⭐ Quality Scores
+                        </h3>
+                        
+                        <div class="score-field">
+                            <label>Semantic Accuracy (1-5)</label>
+                            <div class="score-buttons" id="semantic_accuracy">
+                                ${[1,2,3,4,5].map(n => `
+                                    <button class="score-btn ${scores.semantic_accuracy_1to5 == n ? 'active' : ''}" 
+                                        onclick="setScore('semantic_accuracy_1to5', ${n})">${n}</button>
+                                `).join('')}
+                            </div>
+                            <div class="score-hint">1=Poor, 5=Excellent</div>
+                        </div>
+                        
+                        <div class="score-field">
+                            <label>Completeness (1-5)</label>
+                            <div class="score-buttons" id="completeness">
+                                ${[1,2,3,4,5].map(n => `
+                                    <button class="score-btn ${scores.completeness_1to5 == n ? 'active' : ''}" 
+                                        onclick="setScore('completeness_1to5', ${n})">${n}</button>
+                                `).join('')}
+                            </div>
+                            <div class="score-hint">1=Incomplete, 5=Complete</div>
+                        </div>
+                        
+                        <div class="score-field">
+                            <label>Constraints Preserved</label>
+                            <div class="score-buttons" id="constraints">
+                                ${['Yes', 'No', 'N/A'].map(v => `
+                                    <button class="score-btn ${scores.constraints_preserved_yes_no_na === v ? 'active' : ''}" 
+                                        onclick="setScore('constraints_preserved_yes_no_na', '${v}')">${v}</button>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <div class="score-field">
+                            <label>Overall Quality (1-5)</label>
+                            <div class="score-buttons" id="overall_quality">
+                                ${[1,2,3,4,5].map(n => `
+                                    <button class="score-btn ${scores.overall_quality_1to5 == n ? 'active' : ''}" 
+                                        onclick="setScore('overall_quality_1to5', ${n})">${n}</button>
+                                `).join('')}
+                            </div>
+                            <div class="score-hint">1=Poor, 5=Excellent</div>
+                        </div>
+                        
+                        <div class="score-field">
+                            <label>Issues (if any)</label>
+                            <textarea id="issuesInput" 
+                                style="width: 100%; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 10px; font-size: 13px; color: #c9d1d9; min-height: 80px; resize: vertical; font-family: inherit;"
+                                placeholder="Describe any issues found..."
+                                onkeydown="event.stopPropagation();"
+                                onchange="setScore('issues_if_any', this.value)"
+                            >${escapeHtml(scores.issues_if_any || '')}</textarea>
+                        </div>
+                        
+                        <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #30363d;">
+                            <button class="btn btn-primary" onclick="saveScores()" style="width: 100%;">
+                                💾 Save Scores
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Right: Diff View -->
+                    <div style="background: #161b22; border: 1px solid #30363d; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column;">
+                        <div style="padding: 14px 18px; background: #21262d; border-bottom: 1px solid #30363d; font-weight: 600;">
+                            📊 Changes Diff - Entry #${currentIndex + 1}
+                        </div>
+                        <div style="flex: 1; overflow-y: auto; padding-bottom: 80px;">
+                            <div class="diff-view" style="font-family: 'SF Mono', Monaco, monospace; font-size: 13px;">
+                                ${diff}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function setScore(field, value) {
+            if (!data[currentIndex].scores) {
+                data[currentIndex].scores = {};
+            }
+            
+            const oldValue = data[currentIndex].scores[field];
+            data[currentIndex].scores[field] = value;
+            
+            // Track score changes as uncommitted changes
+            if (oldValue !== value) {
+                if (!uncommittedChanges[currentIndex]) uncommittedChanges[currentIndex] = {};
+                if (!uncommittedChanges[currentIndex]['scores']) {
+                    uncommittedChanges[currentIndex]['scores'] = { history: [] };
+                }
+                uncommittedChanges[currentIndex]['scores'].history.push({
+                    field: field,
+                    from: oldValue,
+                    to: value,
+                    timestamp: new Date().toISOString()
+                });
+                
+                updateStats();
+                updateEntryStatus();
+            }
+            
+            // Update button states without full re-render (prevents scroll jump)
+            updateScoreButtonStates();
+            showToast(`Score updated: ${field} = ${value}`, 'success');
+        }
+        
+        function updateScoreButtonStates() {
+            const scores = data[currentIndex].scores || {};
+            
+            // Update all score buttons
+            document.querySelectorAll('.score-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Semantic accuracy
+            document.querySelectorAll('#semantic_accuracy .score-btn').forEach((btn, idx) => {
+                if (scores.semantic_accuracy_1to5 == (idx + 1)) btn.classList.add('active');
+            });
+            
+            // Completeness
+            document.querySelectorAll('#completeness .score-btn').forEach((btn, idx) => {
+                if (scores.completeness_1to5 == (idx + 1)) btn.classList.add('active');
+            });
+            
+            // Constraints
+            const constraintValues = ['Yes', 'No', 'N/A'];
+            document.querySelectorAll('#constraints .score-btn').forEach((btn, idx) => {
+                if (scores.constraints_preserved_yes_no_na === constraintValues[idx]) btn.classList.add('active');
+            });
+            
+            // Overall quality
+            document.querySelectorAll('#overall_quality .score-btn').forEach((btn, idx) => {
+                if (scores.overall_quality_1to5 == (idx + 1)) btn.classList.add('active');
+            });
+        }
+        
+        function saveScores() {
+            const entry = data[currentIndex];
+            if (!entry.scores) entry.scores = {};
+            
+            // Copy scores to the main data fields for CSV export
+            entry.semantic_accuracy_1to5 = entry.scores.semantic_accuracy_1to5 || '';
+            entry.completeness_1to5 = entry.scores.completeness_1to5 || '';
+            entry.constraints_preserved_yes_no_na = entry.scores.constraints_preserved_yes_no_na || '';
+            entry.overall_quality_1to5 = entry.scores.overall_quality_1to5 || '';
+            entry.issues_if_any = entry.scores.issues_if_any || '';
+            
+            showToast('Scores saved for Entry #' + (currentIndex + 1), 'success');
+            renderEntryList();
+            updateStats();
+        }
+
+        // ============ CHANGE HANDLING ============
+        function handleTurnChange(msgIdx, newValue) {
+            const entry = data[currentIndex];
+            const messages = parseMessages(entry.translated_conversation || '');
+            
+            if (messages[msgIdx]) {
+                const oldValue = messages[msgIdx].content;
+                
+                if (newValue !== oldValue) {
+                    // Track the change
+                    if (!uncommittedChanges[currentIndex]) uncommittedChanges[currentIndex] = {};
+                    if (!uncommittedChanges[currentIndex][`turn-${msgIdx}`]) {
+                        uncommittedChanges[currentIndex][`turn-${msgIdx}`] = {
+                            original: originalData[currentIndex].translated_conversation,
+                            history: []
+                        };
+                    }
+                    uncommittedChanges[currentIndex][`turn-${msgIdx}`].history.push({
+                        from: oldValue,
+                        to: newValue,
+                        timestamp: new Date().toISOString()
+                    });
+                    
+                    // Update the actual data
+                    messages[msgIdx].content = newValue;
+                    entry.translated_conversation = reconstructConversation(messages);
+                }
+            }
+            
+            updateStats();
+            updateEntryStatus();
+            renderEntryList();
+            triggerAutoSave();
+            updateProgress();
+        }
+        
+        // Legacy function for compatibility
+        function handleSentenceChange(msgIdx, sentIdx, newValue) {
+            handleTurnChange(msgIdx, newValue);
+        }
+
+        function handleFullTextChange(newValue) {
+            const oldValue = data[currentIndex].translated_conversation;
+            
+            if (newValue !== oldValue) {
+                if (!uncommittedChanges[currentIndex]) uncommittedChanges[currentIndex] = {};
+                if (!uncommittedChanges[currentIndex]['full']) {
+                    uncommittedChanges[currentIndex]['full'] = { history: [] };
+                }
+                uncommittedChanges[currentIndex]['full'].history.push({
+                    from: oldValue,
+                    to: newValue,
+                    timestamp: new Date().toISOString()
+                });
+                
+                data[currentIndex].translated_conversation = newValue;
+            }
+            
+            updateStats();
+            updateEntryStatus();
+            renderEntryList();
+            triggerAutoSave();
+            updateProgress();
+        }
+
+        function revertTurn(msgIdx) {
+            const originalEntry = originalData[currentIndex];
+            const messages = parseMessages(data[currentIndex].translated_conversation || '');
+            const originalMessages = parseMessages(originalEntry.translated_conversation || '');
+            
+            if (originalMessages[msgIdx]) {
+                messages[msgIdx].content = originalMessages[msgIdx].content;
+                data[currentIndex].translated_conversation = reconstructConversation(messages);
+                
+                // Remove from uncommitted changes
+                if (uncommittedChanges[currentIndex]) {
+                    delete uncommittedChanges[currentIndex][`turn-${msgIdx}`];
+                    if (Object.keys(uncommittedChanges[currentIndex]).length === 0) {
+                        delete uncommittedChanges[currentIndex];
+                    }
+                }
+            }
+            
+            renderContent();
+            updateStats();
+            updateEntryStatus();
+            renderEntryList();
+            showToast(`Turn ${msgIdx + 1} reverted to original`);
+        }
+        
+        // Legacy function
+        function revertSentence(msgIdx, sentIdx) {
+            revertTurn(msgIdx);
+        }
+
+        function revertEntry() {
+            if (confirm('Revert all changes in this entry to the original?')) {
+                data[currentIndex] = JSON.parse(JSON.stringify(originalData[currentIndex]));
+                delete uncommittedChanges[currentIndex];
+                
+                renderContent();
+                updateStats();
+                updateEntryStatus();
+                renderEntryList();
+            }
+        }
+
+        // ============ VERSION CONTROL ============
+        function openCommitModal() {
+            const changeCount = countUncommittedChanges();
+            if (changeCount === 0) {
+                alert('No uncommitted changes to commit!');
+                return;
+            }
+            
+            document.getElementById('commitModal').classList.remove('hidden');
+            document.getElementById('commitMessage').value = '';
+            document.getElementById('commitDetails').value = '';
+            
+            // Show preview
+            const preview = document.getElementById('commitPreview');
+            const entriesChanged = Object.keys(uncommittedChanges).length;
+            preview.innerHTML = `
+                <div style="background: #21262d; padding: 12px; border-radius: 6px; font-size: 13px;">
+                    <div style="margin-bottom: 8px;"><strong>Changes to commit:</strong></div>
+                    <div class="commit-stats">
+                        <span class="additions">+${changeCount} modifications</span>
+                        <span>in ${entriesChanged} entries</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function closeCommitModal() {
+            document.getElementById('commitModal').classList.add('hidden');
+        }
+
+        function commitChanges() {
+            const message = document.getElementById('commitMessage').value.trim();
+            if (!message) {
+                alert('Please enter a commit message');
+                return;
+            }
+            
+            const details = document.getElementById('commitDetails').value.trim();
+            const hash = generateHash();
+            
+            // Capture current scores for all entries
+            const currentScores = {};
+            data.forEach((entry, idx) => {
+                if (entry.scores && Object.keys(entry.scores).length > 0) {
+                    currentScores[idx] = JSON.parse(JSON.stringify(entry.scores));
+                }
+            });
+            
+            const commit = {
+                hash: hash,
+                message: message,
+                details: details,
+                timestamp: new Date().toISOString(),
+                changes: JSON.parse(JSON.stringify(uncommittedChanges)),
+                scores: currentScores,
+                stats: {
+                    entriesModified: Object.keys(uncommittedChanges).length,
+                    totalChanges: countUncommittedChanges()
+                }
+            };
+            
+            commits.push(commit);
+            
+            // Merge uncommitted changes into committed changes
+            for (const entryIdx in uncommittedChanges) {
+                if (!changes[entryIdx]) changes[entryIdx] = {};
+                Object.assign(changes[entryIdx], uncommittedChanges[entryIdx]);
+            }
+            
+            uncommittedChanges = {};
+            
+            closeCommitModal();
+            updateStats();
+            updateEntryStatus();
+            renderEntryList();
+            renderHistoryList();
+            
+            // Auto-save commit history to file
+            autoSaveCommitHistory();
+            
+            showToast(`Committed! History saved as ${currentFileName}_commits.json`, 'success');
+        }
+        
+        function autoSaveCommitHistory() {
+            if (!currentFileName) return;
+            
+            // Capture all current scores
+            const allScores = {};
+            data.forEach((entry, idx) => {
+                if (entry.scores && Object.keys(entry.scores).length > 0) {
+                    allScores[idx] = JSON.parse(JSON.stringify(entry.scores));
+                }
+            });
+            
+            const exportData = {
+                version: 2,
+                exportDate: new Date().toISOString(),
+                sourceFile: currentFileName + '.csv',
+                totalEntries: data.length,
+                commits: commits,
+                uncommittedChanges: uncommittedChanges,
+                allChanges: changes,
+                allScores: allScores
+            };
+            
+            const filename = currentFileName + '_commits.json';
+            download(JSON.stringify(exportData, null, 2), filename, 'application/json');
+        }
+        
+        function tryAutoLoadCommitHistory() {
+            // Show a small popup asking if user wants to load commit history
+            const expectedFilename = currentFileName + '_commits.json';
+            
+            const loadHistory = confirm(
+                `📂 Load Commit History?\n\n` +
+                `Do you want to load a previous commit history file?\n\n` +
+                `Your commit history file should be named:\n` +
+                `➜ ${expectedFilename}\n\n` +
+                `(This file is auto-saved when you commit changes)\n\n` +
+                `Click OK to select your history file, or Cancel to start fresh.`
+            );
+            
+            if (loadHistory) {
+                document.getElementById('historyFileInput').click();
+            }
+        }
+
+        function generateHash() {
+            return Math.random().toString(36).substring(2, 9);
+        }
+
+        function renderHistoryList() {
+            const list = document.getElementById('historyList');
+            
+            if (commits.length === 0) {
+                list.innerHTML = '<p style="padding: 20px; color: #8b949e; text-align: center;">No commits yet</p>';
+                return;
+            }
+            
+            list.innerHTML = commits.slice().reverse().map(commit => `
+                <div class="commit-item" onclick="showCommitDetails('${commit.hash}')">
+                    <div class="commit-hash">${commit.hash}</div>
+                    <div class="commit-message">${escapeHtml(commit.message)}</div>
+                    <div class="commit-meta">${formatDate(commit.timestamp)}</div>
+                    <div class="commit-stats">
+                        <span class="additions">+${commit.stats.totalChanges} changes</span>
+                        <span>${commit.stats.entriesModified} entries</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showCommitDetails(hash) {
+            const commit = commits.find(c => c.hash === hash);
+            if (!commit) return;
+            
+            alert(`Commit: ${commit.hash}\n\nMessage: ${commit.message}\n\nDetails: ${commit.details || 'None'}\n\nTime: ${formatDate(commit.timestamp)}\n\nChanges: ${commit.stats.totalChanges} in ${commit.stats.entriesModified} entries`);
+        }
+
+        function toggleHistory() {
+            document.getElementById('historyPanel').classList.toggle('hidden');
+            renderHistoryList();
+        }
+
+        // ============ EXPORT FUNCTIONS ============
+        function exportAll() {
+            document.getElementById('exportModal').classList.remove('hidden');
+        }
+
+        function closeExportModal() {
+            document.getElementById('exportModal').classList.add('hidden');
+        }
+
+        function downloadCorrectedCSV() {
+            // Ensure all score fields are included in headers
+            const scoreFields = ['semantic_accuracy_1to5', 'completeness_1to5', 'constraints_preserved_yes_no_na', 'overall_quality_1to5', 'issues_if_any'];
+            
+            // Get base headers from data, excluding 'scores' object
+            let headers = Object.keys(data[0]).filter(h => h !== 'scores');
+            
+            // Find the position of translated_conversation to insert the corrected column after it
+            const translatedIdx = headers.indexOf('translated_conversation');
+            if (translatedIdx !== -1 && !headers.includes('translated_conversation_corrected')) {
+                headers.splice(translatedIdx + 1, 0, 'translated_conversation_corrected');
+            }
+            
+            // Add score fields if not already present
+            scoreFields.forEach(field => {
+                if (!headers.includes(field)) {
+                    headers.push(field);
+                }
+            });
+            
+            let csv = headers.map(h => `"${h}"`).join(',') + '\n';
+            
+            data.forEach((row, idx) => {
+                // Copy scores to row fields before export
+                if (row.scores) {
+                    scoreFields.forEach(field => {
+                        if (row.scores[field] !== undefined) {
+                            row[field] = row.scores[field];
+                        }
+                    });
+                }
+                
+                // Add the corrected translation (current translated_conversation value)
+                // The original is preserved in originalData
+                row.translated_conversation_corrected = row.translated_conversation;
+                
+                // Restore original translated_conversation from originalData
+                if (originalData[idx]) {
+                    row.translated_conversation = originalData[idx].translated_conversation;
+                }
+                
+                csv += headers.map(h => {
+                    const val = row[h];
+                    if (val === undefined || val === null) return '""';
+                    return `"${String(val).replace(/"/g, '""')}"`;
+                }).join(',') + '\n';
+                
+                // Restore the corrected version back for the UI
+                row.translated_conversation = row.translated_conversation_corrected;
+            });
+            
+            const filename = currentFileName ? currentFileName + '_corrected.csv' : 'corrected_translations.csv';
+            download(csv, filename, 'text/csv');
+        }
+
+        function downloadChangesJSON() {
+            const exportData = {
+                exportDate: new Date().toISOString(),
+                totalEntries: data.length,
+                commits: commits,
+                uncommittedChanges: uncommittedChanges,
+                allChanges: changes
+            };
+            
+            download(JSON.stringify(exportData, null, 2), 'translation_changes.json', 'application/json');
+        }
+
+        function downloadCommitHistory() {
+            let text = '═══════════════════════════════════════════════════════════════\n';
+            text += '                    TRANSLATION COMMIT HISTORY                    \n';
+            text += '═══════════════════════════════════════════════════════════════\n\n';
+            text += `Export Date: ${new Date().toLocaleString()}\n`;
+            text += `Total Commits: ${commits.length}\n`;
+            text += `Total Entries: ${data.length}\n\n`;
+            
+            commits.forEach((commit, idx) => {
+                text += '───────────────────────────────────────────────────────────────\n';
+                text += `COMMIT #${idx + 1}\n`;
+                text += '───────────────────────────────────────────────────────────────\n';
+                text += `Hash:    ${commit.hash}\n`;
+                text += `Date:    ${formatDate(commit.timestamp)}\n`;
+                text += `Message: ${commit.message}\n`;
+                if (commit.details) text += `Details: ${commit.details}\n`;
+                text += `Stats:   ${commit.stats.totalChanges} changes in ${commit.stats.entriesModified} entries\n\n`;
+                
+                // List affected entries
+                text += 'Affected Entries:\n';
+                for (const entryIdx in commit.changes) {
+                    text += `  • Entry #${parseInt(entryIdx) + 1}\n`;
+                }
+                text += '\n';
+            });
+            
+            download(text, 'commit_history.txt', 'text/plain');
+        }
+
+        function downloadDetailedReport() {
+            let text = '═══════════════════════════════════════════════════════════════\n';
+            text += '              DETAILED TRANSLATION CORRECTION REPORT              \n';
+            text += '═══════════════════════════════════════════════════════════════\n\n';
+            text += `Generated: ${new Date().toLocaleString()}\n\n`;
+            
+            // Summary
+            text += '┌─────────────────────────────────────────────────────────────┐\n';
+            text += '│                         SUMMARY                             │\n';
+            text += '├─────────────────────────────────────────────────────────────┤\n';
+            text += `│  Total Entries:        ${data.length.toString().padEnd(36)}│\n`;
+            text += `│  Modified Entries:     ${Object.keys(changes).length.toString().padEnd(36)}│\n`;
+            text += `│  Total Commits:        ${commits.length.toString().padEnd(36)}│\n`;
+            text += `│  Uncommitted Changes:  ${countUncommittedChanges().toString().padEnd(36)}│\n`;
+            text += '└─────────────────────────────────────────────────────────────┘\n\n';
+            
+            // Detailed changes per entry
+            text += '═══════════════════════════════════════════════════════════════\n';
+            text += '                    CHANGES BY ENTRY                           \n';
+            text += '═══════════════════════════════════════════════════════════════\n\n';
+            
+            for (let i = 0; i < data.length; i++) {
+                const hasChanges = changes[i] || uncommittedChanges[i];
+                if (!hasChanges) continue;
+                
+                text += `\n${'─'.repeat(63)}\n`;
+                text += `ENTRY #${i + 1} - ${data[i].question_id || 'Unknown ID'}\n`;
+                text += `${'─'.repeat(63)}\n\n`;
+                
+                text += 'ORIGINAL TRANSLATION:\n';
+                text += '```\n';
+                text += (originalData[i].translated_conversation || '').substring(0, 1000);
+                if ((originalData[i].translated_conversation || '').length > 1000) text += '\n... [truncated]';
+                text += '\n```\n\n';
+                
+                text += 'CORRECTED TRANSLATION:\n';
+                text += '```\n';
+                text += (data[i].translated_conversation || '').substring(0, 1000);
+                if ((data[i].translated_conversation || '').length > 1000) text += '\n... [truncated]';
+                text += '\n```\n\n';
+            }
+            
+            download(text, 'detailed_report.txt', 'text/plain');
+        }
+
+        function download(content, filename, type) {
+            const blob = new Blob([content], { type: type + ';charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+        }
+
+        // ============ IMPORT HISTORY ============
+        function importHistoryFile(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    restoreFromHistory(importedData);
+                } catch (err) {
+                    showToast('Error parsing history file: ' + err.message, 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function restoreFromHistory(importedData) {
+            // Validate the imported data
+            if (!importedData.commits && !importedData.allChanges && !importedData.uncommittedChanges) {
+                showToast('Invalid history file format', 'error');
+                return;
+            }
+
+            // Restore commits
+            if (importedData.commits && Array.isArray(importedData.commits)) {
+                commits = importedData.commits;
+            }
+
+            // Restore all committed changes
+            if (importedData.allChanges) {
+                changes = importedData.allChanges;
+            }
+
+            // Restore uncommitted changes
+            if (importedData.uncommittedChanges) {
+                uncommittedChanges = importedData.uncommittedChanges;
+            }
+
+            // Apply the changes to the data
+            // For each entry that has changes, reconstruct the translated_conversation
+            for (const entryIdx in changes) {
+                const idx = parseInt(entryIdx);
+                if (idx >= 0 && idx < data.length) {
+                    // Get the latest version from history
+                    const entryChanges = changes[entryIdx];
+                    for (const turnKey in entryChanges) {
+                        if (turnKey.startsWith('turn-')) {
+                            const msgIdx = parseInt(turnKey.replace('turn-', ''));
+                            const history = entryChanges[turnKey].history || [];
+                            if (history.length > 0) {
+                                // Apply the latest change
+                                const latestChange = history[history.length - 1];
+                                const messages = parseMessages(data[idx].translated_conversation || '');
+                                if (messages[msgIdx]) {
+                                    messages[msgIdx].content = latestChange.to;
+                                    data[idx].translated_conversation = reconstructConversation(messages);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Also apply uncommitted changes
+            for (const entryIdx in uncommittedChanges) {
+                const idx = parseInt(entryIdx);
+                if (idx >= 0 && idx < data.length) {
+                    const entryChanges = uncommittedChanges[entryIdx];
+                    for (const turnKey in entryChanges) {
+                        if (turnKey.startsWith('turn-')) {
+                            const msgIdx = parseInt(turnKey.replace('turn-', ''));
+                            const history = entryChanges[turnKey].history || [];
+                            if (history.length > 0) {
+                                const latestChange = history[history.length - 1];
+                                const messages = parseMessages(data[idx].translated_conversation || '');
+                                if (messages[msgIdx]) {
+                                    messages[msgIdx].content = latestChange.to;
+                                    data[idx].translated_conversation = reconstructConversation(messages);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Restore scores (version 2+ format with allScores)
+            if (importedData.allScores) {
+                for (const entryIdx in importedData.allScores) {
+                    const idx = parseInt(entryIdx);
+                    if (idx >= 0 && idx < data.length) {
+                        data[idx].scores = importedData.allScores[entryIdx];
+                        // Also copy to main fields for CSV export
+                        const scores = data[idx].scores;
+                        if (scores.semantic_accuracy_1to5 !== undefined) data[idx].semantic_accuracy_1to5 = scores.semantic_accuracy_1to5;
+                        if (scores.completeness_1to5 !== undefined) data[idx].completeness_1to5 = scores.completeness_1to5;
+                        if (scores.constraints_preserved_yes_no_na !== undefined) data[idx].constraints_preserved_yes_no_na = scores.constraints_preserved_yes_no_na;
+                        if (scores.overall_quality_1to5 !== undefined) data[idx].overall_quality_1to5 = scores.overall_quality_1to5;
+                        if (scores.issues_if_any !== undefined) data[idx].issues_if_any = scores.issues_if_any;
+                    }
+                }
+            } else if (importedData.commits && importedData.commits.length > 0) {
+                // Backward compatibility: try to get scores from the last commit
+                const lastCommit = importedData.commits[importedData.commits.length - 1];
+                if (lastCommit.scores) {
+                    for (const entryIdx in lastCommit.scores) {
+                        const idx = parseInt(entryIdx);
+                        if (idx >= 0 && idx < data.length) {
+                            data[idx].scores = lastCommit.scores[entryIdx];
+                            const scores = data[idx].scores;
+                            if (scores.semantic_accuracy_1to5 !== undefined) data[idx].semantic_accuracy_1to5 = scores.semantic_accuracy_1to5;
+                            if (scores.completeness_1to5 !== undefined) data[idx].completeness_1to5 = scores.completeness_1to5;
+                            if (scores.constraints_preserved_yes_no_na !== undefined) data[idx].constraints_preserved_yes_no_na = scores.constraints_preserved_yes_no_na;
+                            if (scores.overall_quality_1to5 !== undefined) data[idx].overall_quality_1to5 = scores.overall_quality_1to5;
+                            if (scores.issues_if_any !== undefined) data[idx].issues_if_any = scores.issues_if_any;
+                        }
+                    }
+                }
+            }
+
+            // Update UI
+            renderEntryList();
+            renderContent();
+            updateStats();
+            updateEntryStatus();
+            renderHistoryList();
+            updateProgress();
+
+            const commitCount = commits.length;
+            const changeCount = Object.keys(changes).length + Object.keys(uncommittedChanges).length;
+            const scoreCount = importedData.allScores ? Object.keys(importedData.allScores).length : 0;
+            showToast(`History restored: ${commitCount} commits, ${changeCount} modified entries, ${scoreCount} scored entries`, 'success');
+        }
+
+        // ============ UTILITY FUNCTIONS ============
+        function parseMessages(text) {
+            const messages = [];
+            const parts = text.split(/(\[USER\]:|\[ASSISTANT\]:)/g).filter(p => p.trim());
+            
+            let currentRole = '';
+            for (const part of parts) {
+                if (part === '[USER]:') currentRole = 'user';
+                else if (part === '[ASSISTANT]:') currentRole = 'assistant';
+                else if (currentRole) {
+                    messages.push({ role: currentRole, content: part.trim() });
+                }
+            }
+            
+            return messages;
+        }
+
+        function reconstructConversation(messages) {
+            return messages.map(m => `[${m.role.toUpperCase()}]: ${m.content}`).join('\n\n');
+        }
+
+        function splitIntoSentences(text) {
+            if (!text) return [];
+            // Split on sentence-ending punctuation followed by space or newline
+            return text.split(/(?<=[.!?。！？])\s+/).filter(s => s.trim());
+        }
+
+        function computeDiff(original, current) {
+            const origLines = original.split('\n');
+            const currLines = current.split('\n');
+            
+            let html = '';
+            const maxLen = Math.max(origLines.length, currLines.length);
+            
+            for (let i = 0; i < maxLen; i++) {
+                const origLine = origLines[i] || '';
+                const currLine = currLines[i] || '';
+                
+                if (origLine !== currLine) {
+                    if (origLine) html += `<div class="diff-line deletion">- ${escapeHtml(origLine)}</div>`;
+                    if (currLine) html += `<div class="diff-line addition">+ ${escapeHtml(currLine)}</div>`;
+                } else {
+                    html += `<div class="diff-line context">  ${escapeHtml(origLine)}</div>`;
+                }
+            }
+            
+            return html;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatDate(isoString) {
+            return new Date(isoString).toLocaleString();
+        }
+
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = textarea.scrollHeight + 'px';
+        }
+
+        function hasUncommittedChanges(idx) {
+            return uncommittedChanges[idx] && Object.keys(uncommittedChanges[idx]).length > 0;
+        }
+
+        function hasCommittedChanges(idx) {
+            return changes[idx] && Object.keys(changes[idx]).length > 0;
+        }
+
+        function countUncommittedChanges() {
+            let count = 0;
+            for (const entryIdx in uncommittedChanges) {
+                count += Object.keys(uncommittedChanges[entryIdx]).length;
+            }
+            return count;
+        }
+
+        function updateStats() {
+            document.getElementById('totalEntriesStat').textContent = data.length;
+            document.getElementById('modifiedEntriesStat').textContent = 
+                Object.keys(changes).length + Object.keys(uncommittedChanges).length;
+            document.getElementById('totalChangesStat').textContent = countUncommittedChanges();
+            document.getElementById('commitsStat').textContent = commits.length;
+        }
+
+        function toggleTurnHistory(msgIdx) {
+            const modal = document.getElementById('historyModalOverlay');
+            const body = document.getElementById('historyModalBody');
+            const title = document.getElementById('historyModalTitle');
+            
+            // Get the original text for this turn
+            const originalEntry = originalData[currentIndex];
+            const originalMessages = parseMessages(originalEntry.translated_conversation || '');
+            const originalText = originalMessages[msgIdx] ? originalMessages[msgIdx].content : '';
+            
+            // Get history
+            const key = `turn-${msgIdx}`;
+            let history = [];
+            
+            // Get from uncommitted changes
+            if (uncommittedChanges[currentIndex] && uncommittedChanges[currentIndex][key]) {
+                history = uncommittedChanges[currentIndex][key].history || [];
+            }
+            
+            // Get from committed changes
+            if (changes[currentIndex] && changes[currentIndex][key]) {
+                const committedHistory = changes[currentIndex][key].history || [];
+                history = [...committedHistory, ...history];
+            }
+            
+            title.textContent = `Turn ${msgIdx + 1}`;
+            
+            if (history.length === 0) {
+                body.innerHTML = `
+                    <div class="history-no-changes">
+                        <h3>No changes yet</h3>
+                        <p>Press Enter to edit this turn and start tracking changes.</p>
+                    </div>
+                `;
+            } else {
+                body.innerHTML = history.map((h, i) => `
+                    <div class="history-version">
+                        <div class="history-version-header">
+                            <span class="history-version-badge">Version ${i + 1}</span>
+                            <span class="history-version-time">${formatDate(h.timestamp)}</span>
+                        </div>
+                        <div class="history-diff-container">
+                            <div class="history-diff-side before">
+                                <div class="history-diff-label before">− Before (Red)</div>
+                                <div class="history-diff-content before">${escapeHtml(h.from)}</div>
+                            </div>
+                            <div class="history-diff-side after">
+                                <div class="history-diff-label after">+ After (Green)</div>
+                                <div class="history-diff-content after">${escapeHtml(h.to)}</div>
+                            </div>
+                        </div>
+                    </div>
+                `).reverse().join('');
+            }
+            
+            modal.classList.remove('hidden');
+        }
+
+        function closeHistoryModal(event) {
+            if (event && event.target !== event.currentTarget) return;
+            document.getElementById('historyModalOverlay').classList.add('hidden');
+        }
+        
+        // Legacy function
+        function toggleSentenceHistory(msgIdx, sentIdx) {
+            toggleTurnHistory(msgIdx);
+        }
+
+        let isEditingMode = false;
+        let selectedMsgIdx = 0;
+        let selectedSentIdx = 0;
+
+        function selectSentenceRow(msgIdx, sentIdx) {
+            // Exit editing mode if active
+            if (isEditingMode) {
+                exitEditMode();
+            }
+            
+            selectedMsgIdx = msgIdx;
+            selectedSentIdx = sentIdx;
+            
+            // Remove selection from all rows
+            document.querySelectorAll('.sentence-row').forEach(row => {
+                row.classList.remove('selected', 'editing');
+            });
+            
+            // Add selection to current row
+            const row = document.querySelector(`.sentence-row[data-msg="${msgIdx}"][data-sent="${sentIdx}"]`);
+            if (row) {
+                row.classList.add('selected');
+                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Update current sentence index for toolbar
+                const rows = Array.from(document.querySelectorAll('.sentence-row'));
+                currentSentenceIndex = rows.indexOf(row);
+                updateProgressText();
+            }
+        }
+
+        function enterEditMode() {
+            const row = document.querySelector(`.sentence-row[data-msg="${selectedMsgIdx}"][data-sent="${selectedSentIdx}"]`);
+            if (!row) return;
+            
+            const textarea = document.getElementById(`input-${selectedMsgIdx}`);
+            const display = document.getElementById(`display-${selectedMsgIdx}`);
+            if (!textarea || !display) return;
+            
+            isEditingMode = true;
+            row.classList.remove('selected');
+            row.classList.add('editing');
+            
+            // Hide display, show textarea
+            display.style.display = 'none';
+            textarea.style.display = 'block';
+            textarea.focus();
+            
+            // Move cursor to end
+            textarea.selectionStart = textarea.selectionEnd = textarea.value.length;
+            
+            showToast('✏️ Editing - Press ESC when done', 'success');
+        }
+
+        function exitEditMode() {
+            if (!isEditingMode) return;
+            
+            const row = document.querySelector('.sentence-row.editing');
+            if (row) {
+                const msgIdx = row.dataset.msg;
+                const textarea = document.getElementById(`input-${msgIdx}`);
+                const display = document.getElementById(`display-${msgIdx}`);
+                
+                if (textarea && display) {
+                    // Update display with new content
+                    display.innerHTML = formatAsMarkdown(textarea.value);
+                    
+                    // Hide textarea, show display
+                    textarea.style.display = 'none';
+                    display.style.display = 'block';
+                    textarea.blur();
+                }
+                
+                row.classList.remove('editing');
+                row.classList.add('selected');
+            }
+            isEditingMode = false;
+            showToast('✓ Changes saved', 'success');
+        }
+
+        function navigateSentence(direction) {
+            const rows = Array.from(document.querySelectorAll('.sentence-row'));
+            if (rows.length === 0) return;
+            
+            let newIndex = currentSentenceIndex + direction;
+            
+            // Wrap around
+            if (newIndex < 0) newIndex = rows.length - 1;
+            if (newIndex >= rows.length) newIndex = 0;
+            
+            const row = rows[newIndex];
+            if (row) {
+                const msgIdx = parseInt(row.dataset.msg);
+                const sentIdx = parseInt(row.dataset.sent);
+                selectSentenceRow(msgIdx, sentIdx);
+            }
+        }
+
+        function updateProgressText() {
+            const rows = document.querySelectorAll('.sentence-row');
+            document.getElementById('progressText').textContent = `Turn ${currentSentenceIndex + 1} / ${rows.length}`;
+        }
+
+        // Keep old function name for compatibility
+        function showSentenceHistory(msgIdx, sentIdx) {
+            toggleSentenceHistory(msgIdx, sentIdx);
+        }
+        
+        function highlightSentenceRow(textarea) {
+            // Legacy function - now handled by selectSentenceRow
+        }
+
+        // ============ NAVIGATION & UX FUNCTIONS ============
+        function updateProgress() {
+            const modifiedCount = Object.keys(changes).length + Object.keys(uncommittedChanges).length;
+            const percentage = data.length > 0 ? (modifiedCount / data.length) * 100 : 0;
+            document.getElementById('progressBar').style.width = percentage + '%';
+            document.getElementById('progressText').textContent = `${currentIndex + 1} / ${data.length}`;
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast visible' + (type === 'error' ? ' error' : '');
+            setTimeout(() => toast.classList.remove('visible'), 3000);
+        }
+
+        function jumpToNextModified() {
+            for (let i = currentIndex + 1; i < data.length; i++) {
+                if (hasUncommittedChanges(i) || hasCommittedChanges(i)) {
+                    selectEntry(i);
+                    showToast(`Jumped to modified entry #${i + 1}`);
+                    return;
+                }
+            }
+            // Wrap around
+            for (let i = 0; i < currentIndex; i++) {
+                if (hasUncommittedChanges(i) || hasCommittedChanges(i)) {
+                    selectEntry(i);
+                    showToast(`Jumped to modified entry #${i + 1}`);
+                    return;
+                }
+            }
+            showToast('No other modified entries', 'error');
+        }
+
+        function jumpToPrevModified() {
+            for (let i = currentIndex - 1; i >= 0; i--) {
+                if (hasUncommittedChanges(i) || hasCommittedChanges(i)) {
+                    selectEntry(i);
+                    showToast(`Jumped to modified entry #${i + 1}`);
+                    return;
+                }
+            }
+            // Wrap around
+            for (let i = data.length - 1; i > currentIndex; i--) {
+                if (hasUncommittedChanges(i) || hasCommittedChanges(i)) {
+                    selectEntry(i);
+                    showToast(`Jumped to modified entry #${i + 1}`);
+                    return;
+                }
+            }
+            showToast('No other modified entries', 'error');
+        }
+
+        function jumpToNextSentence() {
+            const rows = document.querySelectorAll('.sentence-row');
+            if (rows.length === 0) return;
+            
+            currentSentenceIndex = Math.min(currentSentenceIndex + 1, rows.length - 1);
+            scrollToSentence(currentSentenceIndex);
+        }
+
+        function jumpToPrevSentence() {
+            currentSentenceIndex = Math.max(currentSentenceIndex - 1, 0);
+            scrollToSentence(currentSentenceIndex);
+        }
+
+        function scrollToSentence(idx) {
+            const rows = document.querySelectorAll('.sentence-row');
+            if (rows[idx]) {
+                // Remove previous focus
+                rows.forEach(r => r.classList.remove('focused'));
+                // Add focus to current
+                rows[idx].classList.add('focused');
+                rows[idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Focus the textarea in this row
+                const textarea = rows[idx].querySelector('textarea');
+                if (textarea) {
+                    setTimeout(() => textarea.focus(), 300);
+                }
+            }
+        }
+
+        function triggerAutoSave() {
+            const dot = document.getElementById('autosaveDot');
+            const text = document.getElementById('autosaveText');
+            
+            dot.classList.add('saving');
+            text.textContent = 'Saving...';
+            
+            clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(() => {
+                dot.classList.remove('saving');
+                text.textContent = 'Saved';
+            }, 1000);
+        }
+
+        function toggleMessageBlock(msgIdx) {
+            const block = document.querySelector(`.message-block[data-msg="${msgIdx}"]`);
+            if (block) {
+                block.classList.toggle('collapsed');
+            }
+        }
+
+        // ============ KEYBOARD SHORTCUTS ============
+        document.addEventListener('keydown', (e) => {
+            // Handle editing mode (when inside textarea)
+            if (isEditingMode) {
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    exitEditMode();
+                    return;
+                }
+                // Allow normal typing in edit mode
+                if (e.target.tagName === 'TEXTAREA') {
+                    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                        e.preventDefault();
+                        openCommitModal();
+                    }
+                    return;
+                }
+            }
+            
+            // Skip if in input field
+            if (e.target.tagName === 'INPUT') return;
+            
+            // Navigation mode (not editing)
+            if (e.key === 'ArrowUp' || e.key === 'k') {
+                e.preventDefault();
+                navigateSentence(-1);
+            } else if (e.key === 'ArrowDown' || e.key === 'j') {
+                e.preventDefault();
+                navigateSentence(1);
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                enterEditMode();
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                exitEditMode();
+            } else if (e.key === 'ArrowLeft' || e.key === 'h') {
+                // Previous entry
+                if (currentIndex > 0) {
+                    selectEntry(currentIndex - 1);
+                }
+            } else if (e.key === 'ArrowRight' || e.key === 'l') {
+                // Next entry
+                if (currentIndex < data.length - 1) {
+                    selectEntry(currentIndex + 1);
+                }
+            } else if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                openCommitModal();
+            } else if (e.key === 'n') {
+                // Next modified
+                jumpToNextModified();
+            } else if (e.key === 'p') {
+                // Previous modified
+                jumpToPrevModified();
+            } else if (e.key === 'r') {
+                // Revert current sentence
+                revertSentence(selectedMsgIdx, selectedSentIdx);
+            }
+        });
+
+        // Update progress when entry changes
+        const originalSelectEntry = selectEntry;
+        selectEntry = function(idx) {
+            originalSelectEntry(idx);
+            currentSentenceIndex = 0;
+            isEditingMode = false;
+            updateProgress();
+            // Auto-select first sentence after a short delay
+            setTimeout(() => {
+                const firstRow = document.querySelector('.sentence-row');
+                if (firstRow) {
+                    selectSentenceRow(0, 0);
+                }
+            }, 100);
+        };
+    </script>
+</body>
+</html>
