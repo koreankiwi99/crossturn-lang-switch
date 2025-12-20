@@ -48,9 +48,6 @@ OPENROUTER_API_KEY=...  # For Gemini, DeepSeek, Command R+
 ```bash
 # Generate all experiment datasets from verified translations
 python src/scripts/data-generation/generate_clean_datasets.py
-
-# Generate distractor datasets (optional)
-python src/scripts/data-generation/generate_distractor.py --lang de
 ```
 
 ### Run Experiments
@@ -113,7 +110,7 @@ python src/scripts/evaluation/task_accuracy.py --input results/responses/gpt-5/r
 |-------|----------|-----|
 | GPT-5 | OpenAI | Direct |
 | Gemini 3 Pro | Google | OpenRouter |
-| Claude Opus 4.5 | Anthropic | Direct |
+| Claude Opus 4.5 | Anthropic | OpenRouter |
 | DeepSeek-V3.1 | DeepSeek | OpenRouter |
 | Command R+ | Cohere | OpenRouter |
 
@@ -125,17 +122,6 @@ python src/scripts/evaluation/task_accuracy.py --input results/responses/gpt-5/r
 | zh | Chinese (Simplified) | Han |
 | es | Spanish | Latin |
 | ar | Arabic | Arabic |
-
-## Citation
-
-```bibtex
-@article{anonymous2025queryfollowing,
-  title={Query-Following vs Context-Anchoring: How LLMs Handle Cross-Turn Language Switching},
-  author={Anonymous},
-  journal={ACL 2025 Submission},
-  year={2025}
-}
-```
 
 ## License
 
