@@ -32,7 +32,7 @@ Where X ∈ {German, Chinese, Spanish, Arabic}
 ### Installation
 
 ```bash
-git clone --recursive https://github.com/<your-org>/crossturn-lang-switch.git
+git clone --recursive https://github.com/koreankiwi99/crossturn-lang-switch.git
 cd crossturn-lang-switch
 
 # If you already cloned without --recursive:
@@ -59,14 +59,14 @@ python src/scripts/data-generation/generate_clean_datasets.py
 ### Run Experiments
 
 ```bash
-# Generate model responses
+# Generate model responses (outputs to results/{model}/)
 python src/scripts/run_experiment.py --model gpt-5 --data data/experiments/en_to_de.jsonl --workers 32
 
 # Evaluate - Layer 1: Language Fidelity
-python src/scripts/evaluation/language_fidelity.py --input results/responses/gpt-5/responses_*.jsonl
+python src/scripts/evaluation/language_fidelity.py --input results/gpt-5/responses_en_to_de_*.jsonl
 
 # Evaluate - Layer 2: Task Accuracy
-python src/scripts/evaluation/task_accuracy.py --input results/responses/gpt-5/responses_*.jsonl
+python src/scripts/evaluation/task_accuracy.py --input results/gpt-5/responses_en_to_de_*.jsonl
 ```
 
 ## Project Structure
@@ -139,6 +139,12 @@ python src/scripts/evaluation/task_accuracy.py --input results/responses/gpt-5/r
 | zh | Chinese (Simplified) | Han |
 | es | Spanish | Latin |
 | ar | Arabic | Arabic |
+
+## Paper
+
+**Query-Following vs Context-Anchoring: How LLMs Handle Cross-Turn Language Switching**
+Kyuhee Kim, Chengheng Li Chen, Anna Sotnikova
+MME Workshop @ EACL 2026
 
 ## License
 
