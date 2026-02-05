@@ -95,10 +95,6 @@ python src/scripts/evaluation/task_accuracy.py --input results/gpt-5/responses_e
 │   │   └── evaluation/            # Evaluation scripts
 │   │       ├── language_fidelity.py   # Layer 1: Language detection
 │   │       └── task_accuracy.py       # Layer 2: GPT-4o judge
-│   └── analysis/                  # Statistical analysis modules
-│       ├── config.py              # Model lists, conditions, display names
-│       └── paper_analysis.py      # Paper statistics generation
-│
 ├── prompts/                       # Externalized evaluation prompts
 ├── notebooks/                     # Analysis notebooks
 │   ├── full_results_tables.ipynb          # Complete results tables
