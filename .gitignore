@@ -1,9 +1,6 @@
 # Reimplementation directory - all research data and attack scripts
 reimplementation/
 
-# Large directories
-pdf/
-
 # Data - only track translations/ and experiments/
 data/archive/
 data/google-translate/
@@ -11,6 +8,9 @@ data/experiments_filtered/
 data/codeswitching/
 data/codeswitching_clean/
 data/codeswitching_verified/
+
+# Annotation data
+annotation/
 
 # Deprecated scripts
 src/scripts/archive/

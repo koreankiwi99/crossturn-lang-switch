@@ -3,15 +3,11 @@
 Run Experiment - Generate Model Responses (Parallel Version)
 
 Send multi-turn conversations to models and save responses.
-Works with both original MultiChallenge and code-switching datasets.
+Works with both original MultiChallenge and cross-turn language switching datasets.
 
 Usage:
-    # Original MultiChallenge
     python run_experiment.py --model gemini-3-pro --workers 32
-    python run_experiment.py --model gpt-4o --samples 20
-
-    # Code-switching dataset
-    python run_experiment.py --model gemini-3-pro --data data/codeswitching/en_to_x/codeswitching_de.jsonl --workers 32
+    python run_experiment.py --model gpt-5 --data data/experiments/en_to_de.jsonl --workers 32
 """
 
 import os
@@ -31,35 +27,7 @@ load_dotenv()
 
 # === MODEL CONFIGURATIONS ===
 MODELS = {
-    # Apertus (EPFL) - Multilingual, 1000+ languages
-    "apertus-70b": {
-        "provider": "apertus",
-        "model_id": "swiss-ai/Apertus-70B-Instruct-2509",
-        "base_url": "https://inference.rcp.epfl.ch/v1",
-        "api_key_env": "APERTUS_API_KEY",
-    },
-    "apertus-8b": {
-        "provider": "apertus",
-        "model_id": "swiss-ai/Apertus-8B-Instruct-2509",
-        "base_url": "https://inference.rcp.epfl.ch/v1",
-        "api_key_env": "APERTUS_API_KEY",
-    },
     # OpenAI
-    "gpt-4o": {
-        "provider": "openai",
-        "model_id": "gpt-4o-2024-08-06",
-        "api_key_env": "OPENAI_API_KEY",
-    },
-    "gpt-4o-mini": {
-        "provider": "openai",
-        "model_id": "gpt-4o-mini",
-        "api_key_env": "OPENAI_API_KEY",
-    },
-    "gpt-4.1": {
-        "provider": "openai",
-        "model_id": "gpt-4.1-2025-04-14",
-        "api_key_env": "OPENAI_API_KEY",
-    },
     "gpt-5": {
         "provider": "openai",
         "model_id": "gpt-5-2025-08-07",
@@ -74,39 +42,12 @@ MODELS = {
         "api_key_env": "ANTHROPIC_API_KEY",
     },
     # OpenRouter
-    "gemini-2.5-pro": {
-        "provider": "openrouter",
-        "model_id": "google/gemini-2.5-pro-preview",
-        "base_url": "https://openrouter.ai/api/v1",
-        "api_key_env": "OPENROUTER_API_KEY",
-    },
     "gemini-3-pro": {
         "provider": "openrouter",
         "model_id": "google/gemini-3-pro-preview",
         "base_url": "https://openrouter.ai/api/v1",
         "api_key_env": "OPENROUTER_API_KEY",
         "temperature": 1.0,  # Google recommends temp=1.0 for Gemini 3 (lower temps degrade reasoning)
-    },
-    "llama-4-maverick": {
-        "provider": "openrouter",
-        "model_id": "meta-llama/llama-4-maverick",
-        "base_url": "https://openrouter.ai/api/v1",
-        "api_key_env": "OPENROUTER_API_KEY",
-    },
-    "qwen3-235b": {
-        "provider": "openrouter",
-        "model_id": "qwen/qwen3-235b-a22b",
-        "base_url": "https://openrouter.ai/api/v1",
-        "api_key_env": "OPENROUTER_API_KEY",
-        "temperature": 0.7,  # Qwen3 recommends non-zero temp; 0.7 for non-thinking mode
-    },
-    # Claude via OpenRouter
-    "claude-opus-4.5-openrouter": {
-        "provider": "openrouter",
-        "model_id": "anthropic/claude-opus-4.5",
-        "base_url": "https://openrouter.ai/api/v1",
-        "api_key_env": "OPENROUTER_API_KEY",
-        "temperature": 0.0,
     },
     # DeepSeek via OpenRouter
     "deepseek-v3.1": {

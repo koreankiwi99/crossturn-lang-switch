@@ -32,6 +32,12 @@ Where X ∈ {German, Chinese, Spanish, Arabic}
 ### Installation
 
 ```bash
+git clone --recursive https://github.com/<your-org>/crossturn-lang-switch.git
+cd crossturn-lang-switch
+
+# If you already cloned without --recursive:
+git submodule update --init
+
 pip install -r requirements.txt
 ```
 
@@ -71,27 +77,38 @@ python src/scripts/evaluation/task_accuracy.py --input results/responses/gpt-5/r
 │   ├── translations/              # GPT-4o verified translations
 │   └── experiments/               # Final experiment datasets
 │       ├── baseline_en.jsonl      # English baseline
-│       ├── baseline_{lang}.jsonl  # Full translation
-│       ├── en_to_{lang}.jsonl     # EN→X condition
-│       └── {lang}_to_en.jsonl     # X→EN condition
+│       ├── baseline_{lang}.jsonl  # Full translation baselines
+│       ├── en_to_{lang}.jsonl     # EN→X conditions
+│       └── {lang}_to_en.jsonl     # X→EN conditions
 │
 ├── results/
+│   ├── responses/                 # Raw model responses (5 models)
 │   ├── layer1/                    # Language fidelity evaluations
 │   ├── layer2/                    # Task accuracy evaluations
-│   └── responses/                 # Raw model responses
+│   ├── cross-lingual/             # X→Y cross-lingual transfer results
+│   └── sysprompt-ablation/        # System prompt ablation results
 │
-├── src/scripts/
-│   ├── run_experiment.py          # Main experiment runner
-│   ├── data-generation/           # Dataset generation scripts
-│   └── evaluation/                # Evaluation scripts
-│       ├── language_fidelity.py   # Layer 1: Language detection
-│       └── task_accuracy.py       # Layer 2: GPT-4o judge
+├── src/
+│   ├── scripts/
+│   │   ├── run_experiment.py      # Main experiment runner
+│   │   ├── data-generation/       # Dataset generation scripts
+│   │   └── evaluation/            # Evaluation scripts
+│   │       ├── language_fidelity.py   # Layer 1: Language detection
+│   │       └── task_accuracy.py       # Layer 2: GPT-4o judge
+│   └── analysis/                  # Statistical analysis modules
+│       ├── config.py              # Model lists, conditions, display names
+│       └── paper_analysis.py      # Paper statistics generation
 │
+├── prompts/                       # Externalized evaluation prompts
 ├── notebooks/                     # Analysis notebooks
-│   ├── consistency_analysis.ipynb # Cross-run variance analysis
-│   └── full_results_tables.ipynb  # Complete results tables
+│   ├── full_results_tables.ipynb          # Complete results tables
+│   ├── conversation_length_analysis.ipynb # Length effect analysis
+│   ├── cross_lingual_analysis.ipynb       # X→Y transfer analysis
+│   ├── sysprompt_ablation.ipynb           # System prompt ablation
+│   └── consistency_analysis.ipynb         # Cross-run variance analysis
 │
-└── figures/                       # Paper figures
+├── pdf/                           # Paper PDF
+└── LICENSE                        # MIT License
 ```
 
 ## Evaluation Metrics
@@ -110,7 +127,7 @@ python src/scripts/evaluation/task_accuracy.py --input results/responses/gpt-5/r
 |-------|----------|-----|
 | GPT-5 | OpenAI | Direct |
 | Gemini 3 Pro | Google | OpenRouter |
-| Claude Opus 4.5 | Anthropic | OpenRouter |
+| Claude Opus 4.5 | Anthropic | Direct |
 | DeepSeek-V3.1 | DeepSeek | OpenRouter |
 | Command R+ | Cohere | OpenRouter |
 
@@ -124,5 +141,7 @@ python src/scripts/evaluation/task_accuracy.py --input results/responses/gpt-5/r
 | ar | Arabic | Arabic |
 
 ## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 This project extends the [MultiChallenge](https://arxiv.org/abs/2501.17399) benchmark.
